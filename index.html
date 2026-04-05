@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ICC Men's T20 World Cup 2024 – Data Analysis Dashboard</title>
+  <meta name="description"
+    content="Interactive data analysis dashboard for ICC Men's T20 World Cup 2024. Explore batting stats, bowling stats, team performance, venues, and more." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- ══════════════ LOADER ══════════════ -->
+  <div class="loader" id="loader">
+    <div class="loader-inner">
+      <div class="loader-logo">
+        <span class="loader-ball">🏏</span>
+      </div>
+      <div class="loader-bar-wrap">
+        <div class="loader-bar" id="loaderBar"></div>
+      </div>
+      <p class="loader-label">Loading Analytics…</p>
+    </div>
+  </div>
+
+  <!-- ══════════════ NAVBAR ══════════════ -->
+  <header class="navbar" id="navbar">
+    <div class="nav-container">
+      <!-- Logo -->
+    <a href="#home" class="nav-logo" id="navLogo">
+      <img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/87/ICC_Men%27s_T20_World_Cup_2024_logo.svg/800px-ICC_Men%27s_T20_World_Cup_2024_logo.svg.png" alt="ICC T20 World Cup 2024" class="nav-logo-img"/>
+    </a>
+
+      <!-- Links -->
+      <nav class="nav-menu" id="navMenu">
+        <a href="#home" class="nav-link active" data-nav="home">Home</a>
+        <a href="#matches" class="nav-link" data-nav="matches">Matches</a>
+        <a href="#teams" class="nav-link" data-nav="teams">Teams</a>
+        <a href="#rankings" class="nav-link" data-nav="rankings">Rankings</a>
+        <a href="#stats" class="nav-link" data-nav="stats">Stats</a>
+        <a href="#news" class="nav-link" data-nav="news">News</a>
+        <a href="#insights" class="nav-link" data-nav="insights">Insights</a>
+      </nav>
+
+      <!-- CTA + hamburger -->
+      <div class="nav-right">
+        <a href="#stats" class="nav-cta-btn">View Stats</a>
+        <button class="hamburger" id="hamburger" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <section class="hero" id="home">
+    <div class="hero-container">
+      <!-- Left -->
+      <div class="hero-left">
+        <div class="hero-eyebrow">
+          <span class="eyebrow-dot"></span>
+          ICC Men's T20 World Cup
+        </div>
+        <h1 class="hero-title">
+          The Ultimate<br />
+          <span class="hero-accent">Cricket Analytics</span><br />
+          Dashboard
+        </h1>
+        <p class="hero-desc">
+          Ball-by-ball intelligence from 52 matches played across the Caribbean and USA.
+          Explore batting records, bowling masterclasses, team battles and deep insights.
+        </p>
+        <div class="hero-actions">
+          <a href="#matches" class="btn-primary">View Matches</a>
+          <a href="#stats" class="btn-secondary">Explore Stats</a>
+        </div>
+        <div class="hero-meta-row">
+          <div class="hero-meta"><strong id="hm-matches">52</strong><span>Matches</span></div>
+          <div class="hero-meta-divider"></div>
+          <div class="hero-meta"><strong id="hm-runs">12,188</strong><span>Total Runs</span></div>
+          <div class="hero-meta-divider"></div>
+          <div class="hero-meta"><strong id="hm-teams">20</strong><span>Teams</span></div>
+          <div class="hero-meta-divider"></div>
+          <div class="hero-meta"><strong id="hm-winner">🇮🇳 India</strong><span>Champions</span></div>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="hero-right">
+        <div class="hero-visual">
+          <div class="hero-bg-overlay"></div>
+  <div class="hero-logo-watermark">
+    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/87/ICC_Men%27s_T20_World_Cup_2024_logo.svg/800px-ICC_Men%27s_T20_World_Cup_2024_logo.svg.png" alt="ICC T20 WC 2024 watermark"/>
+  </div>
+          <div class="hero-stadium-art">
+            <div class="stadium-ring ring-1"></div>
+            <div class="stadium-ring ring-2"></div>
+            <div class="stadium-ring ring-3"></div>
+            <div class="pitch-strip"></div>
+            <div class="hero-ball-wrap">
+              <div class="hero-ball">
+                <div class="ball-seam seam-h"></div>
+                <div class="ball-seam seam-v"></div>
+              </div>
+            </div>
+            <div class="hero-stat-bubble bubble-1">
+              <span class="bub-val">519</span>
+              <span class="bub-label">Sixes</span>
+            </div>
+            <div class="hero-stat-bubble bubble-2">
+              <span class="bub-val">684</span>
+              <span class="bub-label">Wickets</span>
+            </div>
+            <div class="hero-stat-bubble bubble-3">
+              <span class="bub-val">8-0</span>
+              <span class="bub-label">India's Run</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ticker bar -->
+    <div class="ticker-bar">
+      <span class="ticker-label">FINAL</span>
+      <div class="ticker-track">
+        <div class="ticker-inner" id="tickerInner">
+          🏆 India beat South Africa by 7 runs in the Final &nbsp;|&nbsp;
+          🏅 Virat Kohli — Player of the Final &nbsp;|&nbsp;
+          🎳 Arshdeep Singh — Leading wicket-taker &nbsp;|&nbsp;
+          🏏 Rahmanullah Gurbaz — Top run scorer &nbsp;|&nbsp;
+          ⚡ USA held Pakistan to a tie — biggest upset &nbsp;|&nbsp;
+          📍 Nassau County, Providence, Kensington Oval hosted key games
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ QUICK STATS ══════════════ -->
+  <section class="section stats-section" id="stats-bar">
+    <div class="container">
+      <div class="stats-grid" id="statsGrid">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ MATCHES ══════════════ -->
+  <section class="section matches-section" id="matches">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow">Match Centre</p>
+          <h2 class="section-title">All 52 Matches</h2>
+        </div>
+        <div class="section-controls">
+          <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input type="text" id="matchSearch" placeholder="Search team, venue…" />
+          </div>
+          <div class="tab-group" id="matchTabs">
+            <button class="tab active" data-stage="All">All</button>
+            <button class="tab" data-stage="Group">Group</button>
+            <button class="tab" data-stage="Semi Final">Semi-Finals</button>
+            <button class="tab" data-stage="Final">Final</button>
+          </div>
+        </div>
+      </div>
+      <div class="matches-grid" id="matchesGrid"></div>
+      <p class="results-meta" id="resultsCount"></p>
+    </div>
+  </section>
+
+  <!-- ══════════════ TEAMS ══════════════ -->
+  <section class="section teams-section" id="teams">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow">Participating Nations</p>
+          <h2 class="section-title">Teams</h2>
+        </div>
+      </div>
+      <div class="teams-grid" id="teamsGrid"></div>
+
+      <!-- Boundaries chart -->
+      <div class="subsection">
+        <h3 class="subsection-title">Boundary Distribution by Team</h3>
+        <p class="subsection-desc">Fours &amp; Sixes hit by each team across the tournament</p>
+        <div class="chart-card">
+          <canvas id="boundaryChart" style="max-height:340px"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ RANKINGS ══════════════ -->
+  <section class="section rankings-section" id="rankings">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow">Tournament Standings</p>
+          <h2 class="section-title">Rankings &amp; Wins</h2>
+        </div>
+      </div>
+      <div class="rankings-layout">
+        <div class="rankings-table-wrap">
+          <div class="chart-card">
+            <h3 class="card-title">Team Win Tally</h3>
+            <table class="rankings-table" id="rankingsTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Team</th>
+                  <th>Wins</th>
+                  <th>Matches</th>
+                  <th>Win %</th>
+                </tr>
+              </thead>
+              <tbody id="rankingsBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="rankings-chart-wrap">
+          <div class="chart-card">
+            <h3 class="card-title">Wins Comparison</h3>
+            <canvas id="winsChart" style="max-height:400px"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3 class="card-title">Toss Decision</h3>
+            <canvas id="tossChart" style="max-height:240px"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ STATS (Batting + Bowling) ══════════════ -->
+  <section class="section player-stats-section" id="stats">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow">Player Performance</p>
+          <h2 class="section-title">Tournament Stats</h2>
+        </div>
+        <div class="tab-group" id="statsTabs">
+          <button class="tab active" data-panel="batting">Batting</button>
+          <button class="tab" data-panel="bowling">Bowling</button>
+        </div>
+      </div>
+
+      <!-- Batting Panel -->
+      <div class="stats-panel" id="panelBatting">
+        <div class="sort-bar">
+          <span class="sort-label">Sort by:</span>
+          <button class="sort-btn active" data-sort="runs">Runs</button>
+          <button class="sort-btn" data-sort="strike_rate">Strike Rate</button>
+          <button class="sort-btn" data-sort="sixes">Sixes</button>
+          <button class="sort-btn" data-sort="fours">Fours</button>
+        </div>
+        <div class="chart-card" style="margin-bottom:20px">
+          <h3 class="card-title">Top 10 Run Scorers</h3>
+          <canvas id="battingChart" style="max-height:320px"></canvas>
+        </div>
+        <div class="table-card">
+          <table class="data-table" id="battingTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Batter</th>
+                <th>Runs</th>
+                <th>Balls</th>
+                <th>4s</th>
+                <th>6s</th>
+                <th>SR</th>
+                <th>Boundary %</th>
+              </tr>
+            </thead>
+            <tbody id="battingBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Bowling Panel -->
+      <div class="stats-panel hidden" id="panelBowling">
+        <div class="sort-bar">
+          <span class="sort-label">Sort by:</span>
+          <button class="sort-btn active" data-bsort="wickets">Wickets</button>
+          <button class="sort-btn" data-bsort="economy">Economy</button>
+          <button class="sort-btn" data-bsort="dots">Dot Balls</button>
+        </div>
+        <div class="charts-row">
+          <div class="chart-card">
+            <h3 class="card-title">Top Wicket Takers</h3>
+            <canvas id="bowlingWktsChart" style="max-height:310px"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3 class="card-title">Economy Rate</h3>
+            <canvas id="bowlingEconChart" style="max-height:310px"></canvas>
+          </div>
+        </div>
+        <div class="table-card">
+          <table class="data-table" id="bowlingTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Bowler</th>
+                <th>Wkts</th>
+                <th>Balls</th>
+                <th>Runs</th>
+                <th>Economy</th>
+                <th>Dots</th>
+                <th>Dot %</th>
+              </tr>
+            </thead>
+            <tbody id="bowlingBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ NEWS / KEY MOMENTS ══════════════ -->
+  <section class="section news-section" id="news">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow">Tournament Highlights</p>
+          <h2 class="section-title">Key Moments &amp; News</h2>
+        </div>
+      </div>
+      <div class="news-grid" id="newsGrid">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ INSIGHTS ══════════════ -->
+  <section class="section insights-section" id="insights">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="section-eyebrow">Data Analysis</p>
+          <h2 class="section-title">Key Insights</h2>
+        </div>
+      </div>
+      <div class="insights-grid">
+        <div class="insight-card gold">
+          <div class="insight-tag">Championship</div>
+          <h3>India — Unbeaten Champions</h3>
+          <p>India went 8-0 through the tournament — the only undefeated side. They beat England by 68 runs in the
+            Semi-Final and clinched the Final vs South Africa by just 7 runs.</p>
+        </div>
+        <div class="insight-card blue">
+          <div class="insight-tag">Toss Analysis</div>
+          <h3>Field First Strategy</h3>
+          <p>A majority of captains chose to field after winning the toss, reflecting the T20 trend of chasing. However,
+            the data shows mixed outcomes across different venues.</p>
+        </div>
+        <div class="insight-card red">
+          <div class="insight-tag">Bowling</div>
+          <h3>Afghanistan's Spin Web</h3>
+          <p>Afghanistan's bowling unit — Rashid Khan, Naveen-ul-Haq and Fazalhaq Farooqi — dismantled multiple top
+            sides and nearly caused an upset against South Africa in the Semis.</p>
+        </div>
+        <div class="insight-card teal">
+          <div class="insight-tag">Batting</div>
+          <h3>Power-Hitting Era</h3>
+          <p>519 sixes were hit across 52 matches. Teams like West Indies and India led the six-hitting charts,
+            reflecting the power-hitting philosophy of modern T20 cricket.</p>
+        </div>
+        <div class="insight-card purple">
+          <div class="insight-tag">Venue</div>
+          <h3>New York's Seaming Track</h3>
+          <p>The drop-in pitches at Nassau County, New York produced seam-friendly conditions — leading to India's
+            7-wicket win over Pakistan, and the historic USA–Pakistan tie.</p>
+        </div>
+        <div class="insight-card orange">
+          <div class="insight-tag">Upset</div>
+          <h3>USA Holds Pakistan</h3>
+          <p>Match 11 — USA vs Pakistan ended in a tie and USA won the Super Over. One of the biggest shocks in T20
+            World Cup history, showing the global growth of cricket.</p>
+        </div>
+      </div>
+
+      <!-- Player of the Match chart -->
+      <div class="subsection">
+        <h3 class="subsection-title">Player of the Match Awards</h3>
+        <p class="subsection-desc">Players with multiple Man of the Match awards</p>
+        <div class="chart-card">
+          <canvas id="pomChart" style="max-height:280px"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ FOOTER ══════════════ -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="container footer-top-inner">
+        <div class="footer-brand">
+          <div class="footer-logo-wrap">
+          <img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/87/ICC_Men%27s_T20_World_Cup_2024_logo.svg/800px-ICC_Men%27s_T20_World_Cup_2024_logo.svg.png" alt="ICC T20 WC 2024" class="footer-logo-img"/>
+          <span class="footer-logo-label">Analytics Hub</span>
+        </div>
+          <p class="footer-brand-desc">A data analytics dashboard for the ICC Men's T20 World Cup 2024, built with
+            Python, Pandas &amp; Chart.js from ball-by-ball match data.</p>
+        </div>
+        <div class="footer-links-group">
+          <h4>Navigate</h4>
+          <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#matches">Matches</a></li>
+            <li><a href="#teams">Teams</a></li>
+            <li><a href="#rankings">Rankings</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>Analysis</h4>
+          <ul>
+            <li><a href="#stats">Batting Stats</a></li>
+            <li><a href="#stats">Bowling Stats</a></li>
+            <li><a href="#insights">Insights</a></li>
+            <li><a href="#news">Highlights</a></li>
+          </ul>
+        </div>
+        <div class="footer-links-group">
+          <h4>About</h4>
+          <ul>
+            <li><a href="#">Project Overview</a></li>
+            <li><a href="#">Data Sources</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-social">
+          <h4>Follow ICC</h4>
+          <div class="social-links">
+            <a href="#" class="social-btn" aria-label="Twitter">𝕏</a>
+            <a href="#" class="social-btn" aria-label="Instagram">📸</a>
+            <a href="#" class="social-btn" aria-label="YouTube">▶</a>
+            <a href="#" class="social-btn" aria-label="Facebook">f</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <p>© 2024 ICC T20 World Cup Analytics. Built for educational purposes using open match data.</p>
+        <p>Data: <strong>matches.csv</strong> &amp; <strong>deliveries.csv</strong> · 52 Matches · 20 Teams · 🏆 India
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to top -->
+  <button class="back-top" id="backTop" aria-label="Back to top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M18 15l-6-6-6 6" />
+    </svg>
+  </button>
+
+  <script src="playerPhotos.js"></script>
+  <script src="data.js"></script>
+  <script src="main.js"></script>
+</body>
+
+</html>
