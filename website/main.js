@@ -10,12 +10,26 @@ Chart.defaults.font.size = 12;
 
 /* ── Team flags ── */
 const FLAGS = {
-  'India': '🇮🇳', 'South Africa': '🇿🇦', 'Australia': '🇦🇺', 'England': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-  'West Indies': '🏝️', 'Afghanistan': '🇦🇫', 'Bangladesh': '🇧🇩', 'Pakistan': '🇵🇰',
-  'New Zealand': '🇳🇿', 'Sri Lanka': '🇱🇰', 'Ireland': '🇮🇪', 'Scotland': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
-  'Netherlands': '🇳🇱', 'Canada': '🇨🇦', 'Uganda': '🇺🇬', 'Namibia': '🇳🇦',
-  'Oman': '🇴🇲', 'Nepal': '🇳🇵', 'Papua New Guinea': '🇵🇬',
-  'United States of America': '🇺🇸',
+  'India': '<img src="https://flagcdn.com/w40/in.png" class="flag-pic" alt="India" title="India" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'South Africa': '<img src="https://flagcdn.com/w40/za.png" class="flag-pic" alt="South Africa" title="South Africa" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'Australia': '<img src="https://flagcdn.com/w40/au.png" class="flag-pic" alt="Australia" title="Australia" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'England': '<img src="https://flagcdn.com/w40/gb-eng.png" class="flag-pic" alt="England" title="England" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'West Indies': '<img src="https://flagcdn.com/w40/jm.png" class="flag-pic" alt="West Indies" title="West Indies" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'Afghanistan': '<img src="https://flagcdn.com/w40/af.png" class="flag-pic" alt="Afghanistan" title="Afghanistan" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'Bangladesh': '<img src="https://flagcdn.com/w40/bd.png" class="flag-pic" alt="Bangladesh" title="Bangladesh" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'Pakistan': '<img src="https://flagcdn.com/w40/pk.png" class="flag-pic" alt="Pakistan" title="Pakistan" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'New Zealand': '<img src="https://flagcdn.com/w40/nz.png" class="flag-pic" alt="New Zealand" title="New Zealand" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'Sri Lanka': '<img src="https://flagcdn.com/w40/lk.png" class="flag-pic" alt="Sri Lanka" title="Sri Lanka" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'Ireland': '<img src="https://flagcdn.com/w40/ie.png" class="flag-pic" alt="Ireland" title="Ireland" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'Scotland': '<img src="https://flagcdn.com/w40/gb-sct.png" class="flag-pic" alt="Scotland" title="Scotland" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'Netherlands': '<img src="https://flagcdn.com/w40/nl.png" class="flag-pic" alt="Netherlands" title="Netherlands" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'Canada': '<img src="https://flagcdn.com/w40/ca.png" class="flag-pic" alt="Canada" title="Canada" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'Uganda': '<img src="https://flagcdn.com/w40/ug.png" class="flag-pic" alt="Uganda" title="Uganda" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'Namibia': '<img src="https://flagcdn.com/w40/na.png" class="flag-pic" alt="Namibia" title="Namibia" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'Oman': '<img src="https://flagcdn.com/w40/om.png" class="flag-pic" alt="Oman" title="Oman" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'Nepal': '<img src="https://flagcdn.com/w40/np.png" class="flag-pic" alt="Nepal" title="Nepal" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'Papua New Guinea': '<img src="https://flagcdn.com/w40/pg.png" class="flag-pic" alt="Papua New Guinea" title="Papua New Guinea" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
+  'United States of America': '<img src="https://flagcdn.com/w40/us.png" class="flag-pic" alt="United States of America" title="United States of America" loading="lazy" onerror="this.src=\'https://flagcdn.com/w40/un.png\'"/>',
 };
 
 /* ── Player photo map (local generated portraits + dynamic web photos) ── */
