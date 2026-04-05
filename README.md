@@ -1,183 +1,59 @@
-# ICC Men's T20 World Cup 2024 – Exploratory Data Analysis
+# ICC Men's T20 World Cup 2024 – Exploratory Data Analysis & Interactive Dashboard
 
 ## Project Overview
-This project performs a comprehensive Exploratory Data Analysis (EDA) of the ICC Men's T20 World Cup 2024 using Python. The aim of the project is to analyze player and team performance using statistical methods and visualizations.
+This project performs a comprehensive Exploratory Data Analysis (EDA) of the ICC Men's T20 World Cup 2024 using Python, and presents the findings in a production-ready, interactive web dashboard built with HTML, CSS, Vanilla JavaScript, and Chart.js.
 
-The analysis helps identify important patterns such as top-performing batsmen, effective bowlers, and overall match trends throughout the tournament.
-
----
-
-## Objectives
-
-The main objectives of this project are:
-
-- Analyze batting performance across the tournament
-- Identify the top run scorers and players with high strike rates
-- Evaluate bowling performance using wickets, economy rate, and dot balls
-- Compare player performance using statistical metrics
-- Visualize patterns and trends using graphs and charts
-- Generate meaningful insights from match data
+The platform provides a professional, ICC-style interface that allows users to explore tournament statistics, visualize data trends, and analyze individual player and team performances.
 
 ---
 
-## Dataset
+## Features
 
-The analysis uses two main datasets.
-
-### Deliveries Dataset
-This dataset contains ball-by-ball details of every match played in the tournament.
-
-Important attributes include:
-- Match ID
-- Batter
-- Bowler
-- Runs scored
-- Ball number
-- Extras
-- Boundaries
-- Dot balls
-
-### Matches Dataset
-This dataset contains match-level information such as:
-- Match ID
-- Teams
-- Venue
-- Match date
-- Toss result
-- Match winner
-
----
-
-## Technologies Used
-
-- Python
-- Pandas
-- NumPy
-- Matplotlib
-- Seaborn
-- Plotly
-- Jupyter Notebook
-
----
-
-## Data Cleaning and Preprocessing
-
-Before performing analysis, several preprocessing steps were carried out:
-
-- Handling missing values
-- Removing unnecessary columns
-- Converting date columns into proper formats
-- Creating aggregated statistics for players and matches
-
----
-
-## Batting Performance Analysis
-
-The batting analysis focuses on key metrics such as:
-
-- Total runs scored
-- Batting averages
-- Strike rates
-- Number of boundaries
-- Balls faced
-
-This helps identify the most consistent and aggressive batsmen in the tournament.
-
----
-
-## Bowling Performance Analysis
-
-Bowling performance is analyzed using:
-
-- Total wickets taken
-- Economy rate
-- Runs conceded
-- Balls bowled
-- Dot balls
-
-This helps identify bowlers who maintained strong control during matches.
-
----
-
-## Visualizations
-
-The project includes multiple visualizations to better understand the data:
-
-- Bar charts
-- Player comparison graphs
-- Boundary distribution plots
-- Wicket leaderboards
-- Economy rate analysis
-
-These visualizations reveal trends and patterns in the tournament.
-
----
-
-## Key Insights
-
-The analysis identifies:
-
-- Top run scorers in the tournament
-- Bowlers with the highest wickets
-- Players with the best strike rates
-- Boundary scoring patterns
-- Bowlers with strong economy rates
-
----
+- **Interactive Web Dashboard:** A sleek, fully responsive web application styled with authentic ICC branding (Navy/Gold palette).
+- **Match Centre:** Filterable grid displaying the outcome and statistics of all 52 tournament matches.
+- **Dynamic Player Profiles:** Automatically fetches and displays real player profile photos using the Wikipedia API. Includes a smart initial-badge fallback system.
+- **National Flags Integration:** Uses an optimized CDN (`flagcdn.com`) to consistently display high-quality circular national flags for all 20 participating teams.
+- **Data Visualizations:** Interactive Bar, Doughnut, and Line charts powered by Chart.js representing strike rates, economy rates, win distributions, and toss decisions.
+- **Top Performers Showcase:** Highlights leading run-scorers and wicket-takers in a curated display grid.
+- **Performance Optimized:** Uses `loading="lazy"`, object-fit bounding, and minified data mappings to ensure lightning-fast page loading and interaction.
 
 ## Project Structure
 
-```
+```text
 T20-WorldCup-2024-EDA
 │
-├── T20_WorldCup_2024_EDA.ipynb
+├── T20_WorldCup_2024_EDA.ipynb (Original EDA Notebook)
 ├── datasets/
 │   ├── deliveries.csv
 │   └── matches.csv
-└── README.md
+├── website/
+│   ├── index.html       (Main Dashboard UI)
+│   ├── style.css        (Custom Design System)
+│   ├── main.js          (Dashboard Logic & Chart Rendering)
+│   ├── data.js          (Generated JSON Data mapped from EDA)
+│   ├── playerPhotos.js  (Wikipedia Image Mappings)
+│   └── images/          (Locally cached high-res assets)
+├── README.md
+└── prd.md               (Product Requirements Document)
 ```
 
----
+## How to Run the Dashboard
 
-## How to Run the Project
+1. Clone the repository.
+2. Open a terminal and navigate to the project root directory.
+3. Start a local Python server:
+   ```bash
+   python -m http.server 8765 --directory website
+   ```
+4. Open your web browser and navigate to `http://localhost:8765`
 
-1. Clone the repository
-
-```
-git clone https://github.com/yourusername/T20-WorldCup-EDA.git
-```
-
-2. Install required libraries
-
-```
-pip install pandas numpy matplotlib seaborn plotly jupyter
-```
-
-3. Launch Jupyter Notebook
-
-```
-jupyter notebook
-```
-
-4. Open and run:
-
-```
-T20_WorldCup_2024_EDA.ipynb
-```
-
----
-
-## Future Improvements
-
-Possible extensions of this project include:
-
-- Predicting match outcomes using machine learning
-- Player performance prediction
-- Team win probability analysis
-- Interactive dashboards using Streamlit or Power BI
+## Technologies Used
+- **Frontend Dashboard:** HTML5, CSS3, Vanilla JS (ES6+), Chart.js
+- **APIs:** Wikipedia PageImages API, FlagCDN
+- **EDA Analytics:** Python, Pandas, Matplotlib, Jupyter Notebook
 
 ---
 
 ## License
 
-This project is created for educational and analytical purposes.
+This project is created for educational and analytical purposes, utilizing strictly open-source match data.
