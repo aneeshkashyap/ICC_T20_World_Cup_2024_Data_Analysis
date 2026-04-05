@@ -1002,3 +1002,11 @@ ul { list-style: none; }
   height: 24px;
   object-fit: cover;
 }
+
+
+/* ── Align Flag nicely with Player Name ── */
+.player-full-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
