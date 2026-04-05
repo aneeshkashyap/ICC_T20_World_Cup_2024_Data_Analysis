@@ -553,8 +553,8 @@ function renderBattingTable(data) {
         <div class="player-cell">
           ${playerAvatarHTML(p.striker)}
           <div class="player-name-wrap">
-            <span class="player-full-name">${p.striker}</span>
-            <span class="player-country">${flag} ${team}</span>
+            <span class="player-full-name">${flag} ${p.striker}</span>
+            <span class="player-country">${team}</span>
           </div>
         </div>
       </td>
@@ -635,8 +635,8 @@ function renderBowlingTable(data) {
         <div class="player-cell">
           ${playerAvatarHTML(p.bowler)}
           <div class="player-name-wrap">
-            <span class="player-full-name">${p.bowler}</span>
-            <span class="player-country">${flag} ${team}</span>
+            <span class="player-full-name">${flag} ${p.bowler}</span>
+            <span class="player-country">${team}</span>
           </div>
         </div>
       </td>
