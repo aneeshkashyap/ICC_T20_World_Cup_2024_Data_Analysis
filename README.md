@@ -1,56 +1,70 @@
 # ICC Men's T20 World Cup 2024 – Exploratory Data Analysis & Interactive Dashboard
 
 ## Project Overview
-This project performs a comprehensive Exploratory Data Analysis (EDA) of the ICC Men's T20 World Cup 2024 using Python, and presents the findings in a production-ready, interactive web dashboard built with HTML, CSS, Vanilla JavaScript, and Chart.js.
+This project performs a comprehensive Exploratory Data Analysis (EDA) of the ICC Men's T20 World Cup 2024 using Python, and presents the findings in a production-ready, interactive web dashboard.
 
-The platform provides a professional, ICC-style interface that allows users to explore tournament statistics, visualize data trends, and analyze individual player and team performances.
+The platform has been upgraded to a **modern, high-performance React application** featuring a cinematic design, glassmorphism UI components, fluid Framer Motion animations, and data-driven Recharts visualizations. The interface provides a professional sports analytics experience for exploring tournament statistics, charting data trends, and analyzing player/team performances.
 
 ---
 
 ## Features
 
-- **Interactive Web Dashboard:** A sleek, fully responsive web application styled with authentic ICC branding (Navy/Gold palette).
-- **Match Centre:** Filterable grid displaying the outcome and statistics of all 52 tournament matches.
-- **Dynamic Player Profiles:** Automatically fetches and displays real player profile photos using the Wikipedia API. Includes a smart initial-badge fallback system.
-- **National Flags Integration:** Uses an optimized CDN (`flagcdn.com`) to consistently display high-quality circular national flags for all 20 participating teams.
-- **Data Visualizations:** Interactive Bar, Doughnut, and Line charts powered by Chart.js representing strike rates, economy rates, win distributions, and toss decisions.
-- **Top Performers Showcase:** Highlights leading run-scorers and wicket-takers in a curated display grid.
-- **Performance Optimized:** Uses `loading="lazy"`, object-fit bounding, and minified data mappings to ensure lightning-fast page loading and interaction.
+- **Cinematic Web Dashboard:** A sleek, fully responsive React application styled with an authentic ICC-inspired Navy/Gold palette, using advanced glassmorphism techniques.
+- **Animated Hero & Stats Ticker:** Features a bold split-layout hero section and a live, broadcast-style scrolling stats ticker.
+- **Match Centre Grid:** Filterable, interactive grid displaying all 52 tournament matches with "Live Data" badges and hover-lift dynamics.
+- **Premium Player Profiles:** Large circular player avatars with dynamic SVG arc progress rings for runs, wickets, strike rate, and economy.
+- **National Flags Integration:** Built-in mapping utilizing optimized CDNs to display high-quality circular and rectangular national flags for all 20 participating teams.
+- **Data Visualizations:** Interactive Bar charts powered by Recharts, enabling users to tab between Top Runs, Strike Rates, Economy, and Wickets.
+- **Performant & Animated:** Uses `framer-motion` for staggered entry animations, layout transitions, and interactive hover states while utilizing React's `memo` and deferred values for optimized rendering.
 
 ## Project Structure
 
 ```text
 T20-WorldCup-2024-EDA
 │
-├── T20_WorldCup_2024_EDA.ipynb (Original EDA Notebook)
-├── datasets/
-│   ├── deliveries.csv
-│   └── matches.csv
-├── website/
-│   ├── index.html       (Main Dashboard UI)
-│   ├── style.css        (Custom Design System)
-│   ├── main.js          (Dashboard Logic & Chart Rendering)
-│   ├── data.js          (Generated JSON Data mapped from EDA)
-│   ├── playerPhotos.js  (Wikipedia Image Mappings)
-│   └── images/          (Locally cached high-res assets)
+├── T20_WorldCup_2024_EDA.ipynb  (Original EDA Notebook)
+├── datasets/                    (Raw CSV data)
+├── scorecards_generate.py       (Python script to generate JSON from CSVs)
+├── react-dashboard/             (NEW: Modern Frontend App)
+│   ├── src/                     (React Source Code)
+│   │   ├── components/          (React UI Components: PlayerCard, MatchCard, etc.)
+│   │   ├── pages/               (Dashboard.jsx Main Page Layout)
+│   │   ├── index.css            (Tailwind & Custom CSS with glassmorphism)
+│   │   ├── hooks.js             (Custom React hooks)
+│   │   ├── utils.js             (Utility parsing & flag mappings)
+│   │   └── data.json            (Aggregated Tournament Data)
+│   ├── public/                  (Static assets: hero stadium image, svgs)
+│   ├── tailwind.config.js       (Tailwind theme tokens and animations)
+│   ├── vite.config.js           (Vite bundler config)
+│   └── package.json             (NPM Dependencies)
 ├── README.md
-└── prd.md               (Product Requirements Document)
+└── prd.md                       (Product Requirements Document)
 ```
 
 ## How to Run the Dashboard
 
 1. Clone the repository.
-2. Open a terminal and navigate to the project root directory.
-3. Start a local Python server:
+2. Open a terminal and navigate to the newly built React dashboard directory:
    ```bash
-   python -m http.server 8765 --directory website
+   cd react-dashboard
    ```
-4. Open your web browser and navigate to `http://localhost:8765`
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+4. Start the local development server:
+   ```bash
+   npm run dev
+   ```
+5. Open your web browser and navigate to the provided localhost URL (e.g., `http://localhost:5173`)
 
 ## Technologies Used
-- **Frontend Dashboard:** HTML5, CSS3, Vanilla JS (ES6+), Chart.js
-- **APIs:** Wikipedia PageImages API, FlagCDN
-- **EDA Analytics:** Python, Pandas, Matplotlib, Jupyter Notebook
+- **Frontend Framework:** React 18
+- **Styling:** Tailwind CSS
+- **Animations:** Framer Motion
+- **Data Visualization:** Recharts
+- **Build Tool:** Vite
+- **Data Processing:** Python, Pandas, Jupyter Notebook
 
 ---
 
