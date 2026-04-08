@@ -1,0 +1,35 @@
+export const teamFlags = {
+  'India': 'https://flagcdn.com/w40/in.png',
+  'South Africa': 'https://flagcdn.com/w40/za.png',
+  'Australia': 'https://flagcdn.com/w40/au.png',
+  'England': 'https://flagcdn.com/w40/gb-eng.png',
+  'West Indies': 'https://flagcdn.com/w40/jm.png',
+  'Afghanistan': 'https://flagcdn.com/w40/af.png',
+  'Bangladesh': 'https://flagcdn.com/w40/bd.png',
+  'Pakistan': 'https://flagcdn.com/w40/pk.png',
+  'New Zealand': 'https://flagcdn.com/w40/nz.png',
+  'Sri Lanka': 'https://flagcdn.com/w40/lk.png',
+  'Ireland': 'https://flagcdn.com/w40/ie.png',
+  'Scotland': 'https://flagcdn.com/w40/gb-sct.png',
+  'Netherlands': 'https://flagcdn.com/w40/nl.png',
+  'Canada': 'https://flagcdn.com/w40/ca.png',
+  'Uganda': 'https://flagcdn.com/w40/ug.png',
+  'Namibia': 'https://flagcdn.com/w40/na.png',
+  'Oman': 'https://flagcdn.com/w40/om.png',
+  'Nepal': 'https://flagcdn.com/w40/np.png',
+  'Papua New Guinea': 'https://flagcdn.com/w40/pg.png',
+  'United States of America': 'https://flagcdn.com/w40/us.png'
+};
+
+const teamFlagCodes = {
+  'India': 'in', 'South Africa': 'za', 'Australia': 'au', 'England': 'gb-eng',
+  'West Indies': 'jm', 'Afghanistan': 'af', 'Bangladesh': 'bd', 'Pakistan': 'pk',
+  'New Zealand': 'nz', 'Sri Lanka': 'lk', 'Ireland': 'ie', 'Scotland': 'gb-sct',
+  'Netherlands': 'nl', 'Canada': 'ca', 'Uganda': 'ug', 'Namibia': 'na',
+  'Oman': 'om', 'Nepal': 'np', 'Papua New Guinea': 'pg',
+  'United States of America': 'us'
+};
+
+export const getFlag = (teamName) => teamFlags[teamName] || 'https://flagcdn.com/w40/un.png';
+
+export const getFlagCode = (teamName) => teamFlagCodes[teamName] || 'un';
