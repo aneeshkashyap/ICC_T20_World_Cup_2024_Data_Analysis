@@ -16,11 +16,15 @@ export const PLAYER_PHOTOS = {
   "AU Rashid": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Adil_Rashid.jpg/250px-Adil_Rashid.jpg",
   "A Nortje": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Anrich_Nortje_in_2023.jpg/250px-Anrich_Nortje_in_2023.jpg",
   "PD Salt": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/2_02_Phil_Salt.jpg/250px-2_02_Phil_Salt.jpg",
-  "Aaron Jones": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Aaron_Jones_WFT_vs_Packers_OCT2021_%28cropped%29.jpg/250px-Aaron_Jones_WFT_vs_Packers_OCT2021_%28cropped%29.jpg",
+  "Aaron Jones": "https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_320,q_50/lsci/db/PICTURES/CMS/399200/399249.png",
   "RR Pant": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Rishabh_Pant.jpg/250px-Rishabh_Pant.jpg",
   "KA Maharaj": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/New_face_6-_Keshav_Maharaj.jpg/250px-New_face_6-_Keshav_Maharaj.jpg",
   "HH Pandya": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Hardik_Pandya_in_PMO_New_Delhi.jpg/250px-Hardik_Pandya_in_PMO_New_Delhi.jpg",
   "K Rabada": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Rabada.jpg/250px-Rabada.jpg",
   "Naveen-ul-Haq": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Naveen-ul-Haq_in_2023.jpg/250px-Naveen-ul-Haq_in_2023.jpg",
-  "AGS Gous": "https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_320,q_50/lsci/db/PICTURES/CMS/380700/380749.png"
+  "AGS Gous": "https://img1.hscicdn.com/image/upload/f_auto,t_ds_square_w_320,q_50/lsci/db/PICTURES/CMS/380700/380749.png",
+  "RG Sharma": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Prime_Minister_Of_Bharat_Shri_Narendra_Damodardas_Modi_with_Shri_Rohit_Gurunath_Sharma_%28Cropped%29.jpg/250px-Prime_Minister_Of_Bharat_Shri_Narendra_Damodardas_Modi_with_Shri_Rohit_Gurunath_Sharma_%28Cropped%29.jpg",
+  "TM Head": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Travis_Head_bowling_at_Perth_Stadium%2C_First_Test_Australia_versus_West_Indies%2C_2_December_2022_03_%28cropped%29.jpg/250px-Travis_Head_bowling_at_Perth_Stadium%2C_First_Test_Australia_versus_West_Indies%2C_2_December_2022_03_%28cropped%29.jpg",
+  "Q de Kock": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/QUINTON_DE_KOCK_%2815681398316%29.jpg/250px-QUINTON_DE_KOCK_%2815681398316%29.jpg",
+  "Ibrahim Zadran": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Ibrahim_Zadran.jpg/250px-Ibrahim_Zadran.jpg"
 };

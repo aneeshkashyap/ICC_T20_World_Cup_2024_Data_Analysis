@@ -74,7 +74,12 @@ const StatRow = memo(({ label, a, b, higherIsBetter = true, format = v => v ?? '
 });
 
 /* ─── Player Avatar Card ─── */
-const PlayerAvatar = memo(({ player, side }) => (
+const PlayerAvatar = memo(({ player, side }) => {
+  const [imgError, setImgError] = React.useState(false);
+  const fallbackSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(player.name)}&background=0d1f3c&color=F0B429&size=96&bold=true&font-size=0.42`;
+  const avatarSrc = player.image && !imgError ? player.image : fallbackSrc;
+
+  return (
   <motion.div
     initial={{ opacity: 0, x: side === 'left' ? -24 : 24 }}
     animate={{ opacity: 1, x: 0 }}
@@ -83,12 +88,13 @@ const PlayerAvatar = memo(({ player, side }) => (
   >
     <div className="relative">
       <img
-        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(player.name)}&background=0d1f3c&color=F0B429&size=96&bold=true&font-size=0.42`}
+        src={avatarSrc}
         alt={player.name}
-        className="w-20 h-20 rounded-full border-2 border-icc-gold/50 shadow-gold-glow"
+        className="w-20 h-20 rounded-full border-2 border-icc-gold/50 shadow-gold-glow object-cover"
         loading="lazy"
         width={80}
         height={80}
+        onError={() => setImgError(true)}
       />
       <span className={`absolute -bottom-1 -right-1 text-[9px] font-black px-1.5 py-0.5 rounded-full
         ${player.role === 'Batsman' ? 'bg-blue-500' : player.role === 'Bowler' ? 'bg-green-500' : 'bg-icc-gold'} 
@@ -101,7 +107,8 @@ const PlayerAvatar = memo(({ player, side }) => (
       <p className="text-xs text-icc-muted mt-0.5">{player.team || 'Unknown Team'}</p>
     </div>
   </motion.div>
-));
+  );
+});
 
 /* ─── Dropdown ─── */
 const PlayerSelect = memo(({ label, value, onChange, options, excludeId, id }) => (

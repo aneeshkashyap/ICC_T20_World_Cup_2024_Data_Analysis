@@ -16,6 +16,7 @@ import ComparePlayers   from '../components/ComparePlayers';
 import MatchPredictor   from '../components/MatchPredictor';
 import { useDeferredData, useDebounce } from '../hooks';
 import appData from '../data.json';
+import { PLAYER_PHOTOS } from '../playerPhotos';
 
 /* ─── Constants ─── */
 const TEAM_FLAGS = {
@@ -62,14 +63,14 @@ const buildPlayers = () => {
     team: b.team || '', teamFlag: TEAM_FLAGS[b.team] || '',
     role: 'Batsman', runs: b.runs, balls: b.balls, fours: b.fours, sixes: b.sixes,
     strikeRate: b.strike_rate != null ? Number(b.strike_rate).toFixed(1) : null,
-    wickets: null, economy: null, matches: b.innings || null, image: null,
+    wickets: null, economy: null, matches: b.innings || null, image: PLAYER_PHOTOS[b.striker] || null,
   }));
   const bowlers = (appData.topBowlers || []).map(b => ({
     id: `bowl-${b.bowler}`, name: b.bowler,
     team: b.team || '', teamFlag: TEAM_FLAGS[b.team] || '',
     role: 'Bowler', runs: b.runs_given ?? null, wickets: b.wickets,
     economy: b.economy != null ? Number(b.economy).toFixed(2) : null,
-    strikeRate: null, matches: b.innings || null, image: null,
+    strikeRate: null, matches: b.innings || null, image: PLAYER_PHOTOS[b.bowler] || null,
   }));
   return [...batters, ...bowlers];
 };
