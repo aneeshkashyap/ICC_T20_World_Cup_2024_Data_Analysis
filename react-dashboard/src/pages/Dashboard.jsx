@@ -12,6 +12,8 @@ import AnimatedNumber   from '../components/AnimatedNumber';
 import FeaturedMatchCard from '../components/FeaturedMatchCard';
 import StatsTicker      from '../components/StatsTicker';
 import { SectionError } from '../components/Skeletons';
+import ComparePlayers   from '../components/ComparePlayers';
+import MatchPredictor   from '../components/MatchPredictor';
 import { useDeferredData, useDebounce } from '../hooks';
 import appData from '../data.json';
 
@@ -405,6 +407,16 @@ const Dashboard = () => {
       <AnalyticsSection
         batters={appData.topBatters || []}
         bowlers={appData.topBowlers || []}
+      />
+
+      {/* ══════ COMPARE PLAYERS ══════ */}
+      <ComparePlayers players={allPlayers} />
+
+      {/* ══════ MATCH PREDICTOR ══════ */}
+      <MatchPredictor
+        teamWins={appData.teamWins || []}
+        topBatters={appData.topBatters || []}
+        topBowlers={appData.topBowlers || []}
       />
 
       {/* ══════ PLAYERS ══════ */}

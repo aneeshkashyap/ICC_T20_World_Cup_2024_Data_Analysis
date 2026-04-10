@@ -5,6 +5,8 @@ const NAV_LINKS = [
   { label: 'Home',      href: '#hero',      icon: '🏠' },
   { label: 'Matches',   href: '#matches',   icon: '🏏' },
   { label: 'Analytics', href: '#analytics', icon: '📊' },
+  { label: 'Compare',   href: '#compare',   icon: '⚖️' },
+  { label: 'Predictor', href: '#predictor', icon: '🔮' },
   { label: 'Players',   href: '#players',   icon: '👤' },
   { label: 'Teams',     href: '#teams',     icon: '🌍' },
   { label: 'Stats',     href: '#stats',     icon: '📈' },
