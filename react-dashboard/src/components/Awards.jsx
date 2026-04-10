@@ -1,5 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PLAYER_PHOTOS } from '../playerPhotos';
+
+/* Stateful avatar so onError can fall back to the letter tile */
+const AwardAvatar = ({ player, isTop }) => {
+  const [imgError, setImgError] = useState(false);
+  const photo = PLAYER_PHOTOS?.[player];
+  const showPhoto = photo && !imgError;
+  return (
+    <div className={`w-16 h-16 rounded-full overflow-hidden ring-2 ${isTop ? 'ring-yellow-400' : 'ring-white/10'} shadow-lg`}>
+      {showPhoto ? (
+        <img
+          src={photo}
+          alt={player}
+          className="w-full h-full object-cover"
+          loading="lazy"
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <div className="w-full h-full bg-gradient-to-br from-icc-navy to-blue-900 flex items-center justify-center text-xl font-black text-white">
+          {player?.charAt(0)}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const Awards = ({ playerOfMatch }) => {
   return (
@@ -15,7 +39,6 @@ const Awards = ({ playerOfMatch }) => {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
         {playerOfMatch.map((entry, idx) => {
-          const photo = PLAYER_PHOTOS ? PLAYER_PHOTOS[entry.player] : null;
           return (
             <div key={entry.player}
               className={`glass rounded-2xl p-4 card-hover text-center flex flex-col items-center gap-3 relative overflow-hidden
@@ -34,15 +57,7 @@ const Awards = ({ playerOfMatch }) => {
               )}
 
               {/* Avatar */}
-              <div className={`w-16 h-16 rounded-full overflow-hidden ring-2 ${idx === 0 ? 'ring-yellow-400' : 'ring-white/10'} shadow-lg`}>
-                {photo ? (
-                  <img src={photo} alt={entry.player} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-icc-navy to-blue-900 flex items-center justify-center text-xl font-black text-white">
-                    {entry.player?.charAt(0)}
-                  </div>
-                )}
-              </div>
+              <AwardAvatar player={entry.player} isTop={idx === 0} />
 
               <div>
                 <h4 className={`font-condensed font-black text-sm uppercase tracking-wide leading-tight ${idx === 0 ? 'text-yellow-400' : 'text-white'}`}>

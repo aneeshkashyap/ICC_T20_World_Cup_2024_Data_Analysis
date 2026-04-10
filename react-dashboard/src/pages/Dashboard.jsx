@@ -248,7 +248,8 @@ const Dashboard = () => {
       transition={{ duration: 0.6 }}
     >
       {/* ══════ HERO (cinematic split) ══════ */}
-      <section id="hero" aria-labelledby="hero-heading" className="hero-stadium">
+      <section id="hero" aria-labelledby="hero-heading" className="hero-stadium"
+        style={{ backgroundImage: `url(${import.meta.env.BASE_URL}stadium.png)` }}>
         {/* Dark cinematic overlay */}
         <div className="hero-overlay" aria-hidden="true" />
 
