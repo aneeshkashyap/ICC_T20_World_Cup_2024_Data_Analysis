@@ -1,5 +1,5 @@
 import React, { memo, useState, useCallback, useRef } from 'react';
-import { motion, useInView, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import { motion, AnimatePresence, useInView, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { getFlag } from '../utils';
 
 /* ─── Role config ─── */
@@ -68,7 +68,8 @@ const StatBar = ({ label, value, max, grad, delay = 0, formatVal }) => {
 };
 
 /* ─── Main PlayerCard ─── */
-const PlayerCard = memo(({ player, index = 0, maxRuns = 300, maxWickets = 20 }) => {
+const PlayerCard = memo(({ player, index = 0, maxRuns = 300, maxWickets = 20,
+                          compareMode = false, isSelected = false, onToggleSelect }) => {
   const {
     name, team, teamFlag, role = 'Batsman',
     runs, wickets, strikeRate, economy, matches, image,
@@ -108,6 +109,14 @@ const PlayerCard = memo(({ player, index = 0, maxRuns = 300, maxWickets = 20 }) 
   const isBatsman = role === 'Batsman' || role === 'All-rounder';
   const isBowler  = role === 'Bowler'  || role === 'All-rounder';
 
+  /* top-stat badge */
+  const isTopScorer = isBatsman && runs != null && runs >= 200;
+  const isWicketStar = isBowler && wickets != null && wickets >= 15;
+  const topBadge = isTopScorer && isWicketStar ? { icon: '⭐', label: 'Star Player', cls: 'bg-icc-gold/20 text-icc-gold border-icc-gold/30' }
+    : isTopScorer  ? { icon: '🏏', label: 'Top Scorer',     cls: 'bg-blue-500/15 text-blue-300 border-blue-500/25' }
+    : isWicketStar ? { icon: '🎯', label: 'Wicket Taker',   cls: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/25' }
+    : null;
+
   return (
     <motion.article
       ref={cardRef}
@@ -120,9 +129,56 @@ const PlayerCard = memo(({ player, index = 0, maxRuns = 300, maxWickets = 20 }) 
       style={{ rotateX, rotateY, transformPerspective: 900, transformStyle: 'preserve-3d' }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="player-card rounded-2xl overflow-hidden flex flex-col group cursor-default relative"
+      className={`player-card rounded-2xl overflow-hidden flex flex-col group relative
+                 ${compareMode ? 'cursor-pointer' : 'cursor-default'}
+                 ${isSelected ? 'ring-2 ring-icc-gold shadow-[0_0_24px_4px_rgba(255,215,0,0.22)]' : ''}`}
       aria-label={`${name}, ${team}, ${role}`}
+      onClick={compareMode && onToggleSelect ? () => onToggleSelect(player.id) : undefined}
     >
+      {/* Selected overlay */}
+      <AnimatePresence>
+        {isSelected && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-20 pointer-events-none rounded-2xl
+                       bg-icc-gold/[0.07] flex items-start justify-end p-2"
+          >
+            <div className="w-6 h-6 rounded-full bg-icc-gold flex items-center justify-center shadow-lg">
+              <svg className="w-3.5 h-3.5 text-icc-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Compare toggle button (visible in compareMode) */}
+      <AnimatePresence>
+        {compareMode && !isSelected && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.7 }}
+            whileHover={{ scale: 1.15 }}
+            whileTap={{ scale: 0.9 }}
+            transition={{ duration: 0.15 }}
+            onClick={e => { e.stopPropagation(); onToggleSelect?.(player.id); }}
+            aria-label={`Add ${name} to comparison`}
+            className="absolute top-2 right-2 z-20 w-6 h-6 rounded-full
+                       bg-white/10 border border-white/20 text-white/60
+                       hover:bg-icc-gold hover:border-icc-gold hover:text-icc-dark
+                       flex items-center justify-center transition-all duration-200
+                       shadow-md"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       {/* Role-colored top bar */}
       <div className={`h-[3px] w-full bg-gradient-to-r ${cfg.grad}`} />
 
@@ -161,6 +217,13 @@ const PlayerCard = memo(({ player, index = 0, maxRuns = 300, maxWickets = 20 }) 
         <div className="text-center">
           <p className="font-bold text-sm text-white leading-tight truncate max-w-[160px]">{name}</p>
           <p className="text-[10px] text-white/40 mt-0.5 truncate">{team}</p>
+          {/* Top-stat badge */}
+          {topBadge && (
+            <div className={`inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full
+                            text-[8px] font-bold border ${topBadge.cls}`}>
+              <span>{topBadge.icon}</span><span>{topBadge.label}</span>
+            </div>
+          )}
           <span className={`inline-flex items-center mt-2 px-2.5 py-0.5 rounded-full
                             text-[8px] font-bold uppercase tracking-[0.15em] border ${
             role === 'Batsman'       ? 'bg-blue-500/15 text-blue-300 border-blue-500/20' :

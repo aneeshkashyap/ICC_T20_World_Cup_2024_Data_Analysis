@@ -1,4 +1,4 @@
-import React, { useState, useMemo, memo } from 'react';
+import React, { useState, useMemo, memo, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /* ─── Stat bar ─── */
@@ -136,9 +136,17 @@ const PlayerSelect = memo(({ label, value, onChange, options, excludeId, id }) =
 ));
 
 /* ─── Main Component ─── */
-const ComparePlayers = ({ players = [] }) => {
-  const [idA, setIdA] = useState('');
-  const [idB, setIdB] = useState('');
+const ComparePlayers = ({ players = [], defaultIdA = '', defaultIdB = '' }) => {
+  const [idA, setIdA] = useState(defaultIdA);
+  const [idB, setIdB] = useState(defaultIdB);
+
+  /* Sync when parent pre-selects players from cards */
+  useEffect(() => { if (defaultIdA) setIdA(defaultIdA); }, [defaultIdA]);
+  useEffect(() => { if (defaultIdB) setIdB(defaultIdB); }, [defaultIdB]);
+
+  const swapPlayers = useCallback(() => {
+    setIdA(prev => { setIdB(prev); return idB; });
+  }, [idB]);
 
   const playerA = useMemo(() => players.find(p => p.id === idA) || null, [players, idA]);
   const playerB = useMemo(() => players.find(p => p.id === idB) || null, [players, idB]);
@@ -234,7 +242,7 @@ const ComparePlayers = ({ players = [] }) => {
           className="backdrop-blur-lg bg-white/10 border border-white/10 rounded-3xl p-6 sm:p-8
                      shadow-[0_8px_40px_rgba(0,0,0,0.4)] max-w-3xl mx-auto"
         >
-          {/* Dropdowns */}
+          {/* Dropdowns + swap */}
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
             <PlayerSelect
               id="player-a-select"
@@ -244,8 +252,26 @@ const ComparePlayers = ({ players = [] }) => {
               options={players}
               excludeId={idB}
             />
-            <div className="flex items-end justify-center pb-1">
+            <div className="flex flex-col items-center justify-center gap-2 pb-1">
               <span className="font-condensed font-black text-2xl text-icc-gold">VS</span>
+              <motion.button
+                whileHover={{ scale: 1.15, rotate: 180 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.25 }}
+                onClick={swapPlayers}
+                disabled={!idA && !idB}
+                aria-label="Swap players"
+                title="Swap players"
+                className="w-7 h-7 rounded-full bg-white/10 border border-white/15 text-icc-muted
+                           hover:bg-icc-gold/20 hover:border-icc-gold/40 hover:text-icc-gold
+                           flex items-center justify-center transition-colors disabled:opacity-30
+                           disabled:pointer-events-none"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+              </motion.button>
             </div>
             <PlayerSelect
               id="player-b-select"

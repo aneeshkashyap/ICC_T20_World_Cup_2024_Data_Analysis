@@ -280,6 +280,8 @@ const Dashboard = () => {
   const [rawSearch,    setRawSearch]    = useState('');
   const [view,         setView]         = useState('grid'); // 'grid' | 'table' | 'teams'
   const [heroMatch,    setHeroMatch]    = useState(null);
+  const [compareMode,  setCompareMode]  = useState(false);
+  const [compareIds,   setCompareIds]   = useState([]); // max 2 player IDs
 
   /* ── Hero parallax ── */
   const { scrollY } = useScroll();
@@ -347,6 +349,18 @@ const Dashboard = () => {
   const handleTeamChange = useCallback(t => setSelectedTeam(t), []);
   const handleRoleChange = useCallback(r => setSelectedRole(r), []);
   const handleSearch     = useCallback(s => setRawSearch(s),    []);
+
+  const handleToggleCompare = useCallback(id => {
+    setCompareIds(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
+      if (prev.length >= 2)  return [prev[1], id]; // slide window: keep latest
+      return [...prev, id];
+    });
+  }, []);
+
+  const handleToggleCompareMode = useCallback(() => {
+    setCompareMode(m => { if (m) setCompareIds([]); return !m; });
+  }, []);
 
   const filterTitleId = useId();
 
@@ -627,7 +641,11 @@ const Dashboard = () => {
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
-          <ComparePlayers players={allPlayers} />
+          <ComparePlayers
+            players={allPlayers}
+            defaultIdA={compareIds[0] || ''}
+            defaultIdB={compareIds[1] || ''}
+          />
         </motion.div>
       </ErrorBoundary>
 
@@ -659,25 +677,56 @@ const Dashboard = () => {
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
           <SectionHeader eyebrow="Top Performers" title="Players" id={filterTitleId} />
 
-          {/* View toggle + count */}
+          {/* View toggle + compare mode button + count */}
           <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
-            <div className="inline-flex gap-1 p-1 rounded-xl glass-card"
-              role="group" aria-label="Player view mode">
-              {[
-                ['grid',  '⊞ Grid'],
-                ['table', '≡ Table'],
-                ['teams', '⊟ Teams'],
-              ].map(([v, label]) => (
-                <motion.button key={v}
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="inline-flex gap-1 p-1 rounded-xl glass-card"
+                role="group" aria-label="Player view mode">
+                {[
+                  ['grid',  '⊞ Grid'],
+                  ['table', '≡ Table'],
+                  ['teams', '⊟ Teams'],
+                ].map(([v, label]) => (
+                  <motion.button key={v}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setView(v)}
+                    aria-pressed={view === v}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide transition-all duration-200
+                      ${view === v ? 'bg-icc-gold text-icc-dark shadow' : 'text-icc-muted hover:text-white'}`}>
+                    {label}
+                  </motion.button>
+                ))}
+              </div>
+
+              {/* Compare mode toggle — only relevant in grid view */}
+              {view === 'grid' && (
+                <motion.button
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setView(v)}
-                  aria-pressed={view === v}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide transition-all duration-200
-                    ${view === v ? 'bg-icc-gold text-icc-dark shadow' : 'text-icc-muted hover:text-white'}`}>
-                  {label}
+                  onClick={handleToggleCompareMode}
+                  aria-pressed={compareMode}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold
+                              uppercase tracking-wide transition-all duration-200 border
+                              ${
+                                compareMode
+                                  ? 'bg-icc-gold/15 text-icc-gold border-icc-gold/30 shadow-[0_0_12px_rgba(255,215,0,0.15)]'
+                                  : 'glass-card border-icc-border/40 text-icc-muted hover:text-white'
+                              }`}
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  {compareMode ? 'Exit Compare' : 'Compare'}
+                  {compareMode && compareIds.length > 0 && (
+                    <span className="ml-0.5 w-4 h-4 rounded-full bg-icc-gold text-icc-dark
+                                     text-[9px] font-black flex items-center justify-center">
+                      {compareIds.length}
+                    </span>
+                  )}
                 </motion.button>
-              ))}
+              )}
             </div>
+
             <p role="status" aria-live="polite" className="text-xs text-icc-muted">
               Showing <span className="text-white font-semibold">{filteredPlayers.length}</span> player{filteredPlayers.length !== 1 ? 's' : ''}
             </p>
@@ -733,7 +782,13 @@ const Dashboard = () => {
                       </p>
                     ) : filteredPlayers.map((player, idx) => (
                       <div key={player.id} role="listitem">
-                        <PlayerCard player={player} index={idx} maxRuns={maxRuns} maxWickets={maxWickets} />
+                        <PlayerCard
+                          player={player} index={idx}
+                          maxRuns={maxRuns} maxWickets={maxWickets}
+                          compareMode={compareMode}
+                          isSelected={compareIds.includes(player.id)}
+                          onToggleSelect={handleToggleCompare}
+                        />
                       </div>
                     ))}
                   </div>
@@ -790,6 +845,64 @@ const Dashboard = () => {
             )}
           </AnimatePresence>
         </div>
+
+        {/* ── Floating compare tray ── */}
+        <AnimatePresence>
+          {compareMode && compareIds.length > 0 && (
+            <motion.div
+              initial={{ y: 80, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 80, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+              className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50
+                         flex items-center gap-3 px-5 py-3 rounded-2xl
+                         bg-icc-dark/90 backdrop-blur-xl border border-icc-gold/25
+                         shadow-[0_8px_40px_rgba(0,0,0,0.6)]"
+            >
+              <span className="text-[11px] font-bold text-icc-gold uppercase tracking-widest whitespace-nowrap">
+                {compareIds.length === 1 ? 'Pick 1 more' : '2 players ready'}
+              </span>
+
+              <div className="flex items-center gap-2">
+                {compareIds.map(id => {
+                  const p = allPlayers.find(pl => pl.id === id);
+                  return p ? (
+                    <div key={id} className="flex items-center gap-1 bg-white/8 rounded-lg px-2 py-1 border border-white/10">
+                      <span className="text-xs font-semibold text-white leading-none">
+                        {p.name.split(' ').pop()}
+                      </span>
+                      <button
+                        onClick={() => handleToggleCompare(id)}
+                        aria-label={`Remove ${p.name} from comparison`}
+                        className="ml-1 text-icc-muted hover:text-red-400 transition-colors leading-none"
+                      >
+                        <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ) : null;
+                })}
+              </div>
+
+              {compareIds.length === 2 && (
+                <a
+                  href="#compare"
+                  onClick={() => setCompareMode(false)}
+                  className="flex items-center gap-1.5 bg-icc-gold text-icc-dark
+                             text-[11px] font-black uppercase tracking-wider
+                             px-4 py-2 rounded-xl hover:brightness-110
+                             transition-all whitespace-nowrap"
+                >
+                  Compare Now
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </a>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.section>
       </ErrorBoundary>
       <ErrorBoundary fallbackMessage="Team rankings failed to load.">
