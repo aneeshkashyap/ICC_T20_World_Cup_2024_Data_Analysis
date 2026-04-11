@@ -29,9 +29,9 @@
     @apply shadow-glass transition-all duration-300;
   }
   .glass-card:hover {
-    border-color: rgba(255,215,0,0.2);
-    background: linear-gradient(135deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.04) 100%);
-    @apply shadow-card-hover;
+    border-color: rgba(255,215,0,0.22);
+    background: linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.05) 100%);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,215,0,0.12), inset 0 1px 0 rgba(255,255,255,0.08);
   }
   .glass-nav {
     background: rgba(8, 15, 30, 0.85);
@@ -72,9 +72,9 @@
     @apply shadow-glass transition-all duration-300;
   }
   .match-card:hover {
-    background: rgba(255,255,255,0.08);
-    border-color: rgba(255,215,0,0.28);
-    box-shadow: 0 20px 56px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,215,0,0.15);
+    background: rgba(255,255,255,0.09);
+    border-color: rgba(255,215,0,0.35);
+    box-shadow: 0 28px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,215,0,0.22), 0 0 40px rgba(255,215,0,0.08);
   }
 
   /* ═══════════════════════════════════════════
@@ -89,8 +89,8 @@
     transition: all 0.3s ease;
   }
   .featured-match-card:hover {
-    border-color: rgba(255,215,0,0.30);
-    box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,215,0,0.20);
+    border-color: rgba(255,215,0,0.40);
+    box-shadow: 0 40px 96px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,215,0,0.25), 0 0 48px rgba(255,215,0,0.10);
   }
 
   /* ═══════════════════════════════════════════
@@ -130,20 +130,22 @@
     @apply inline-flex items-center justify-center gap-2 px-7 py-3.5
            rounded-full bg-icc-gold text-icc-dark font-bold text-sm
            tracking-widest uppercase transition-all duration-200
-           hover:brightness-110 hover:scale-105 active:scale-95
+           hover:brightness-110 active:scale-95
            shadow-gold-glow;
   }
   .btn-outline-gold {
     @apply inline-flex items-center justify-center gap-2 px-7 py-3.5
            rounded-full font-bold text-sm tracking-widest uppercase
            text-icc-gold transition-all duration-200
-           hover:scale-105 active:scale-95;
+           active:scale-95;
     background: rgba(255,255,255,0.05);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(255,215,0,0.35);
   }
   .btn-outline-gold:hover {
-    background: rgba(255,215,0,0.12);
+    background: rgba(255,215,0,0.14);
+    border-color: rgba(255,215,0,0.55);
+    box-shadow: 0 0 20px rgba(255,215,0,0.15);
   }
 
   /* ═══════════════════════════════════════════

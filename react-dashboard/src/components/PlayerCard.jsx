@@ -116,7 +116,7 @@ const PlayerCard = memo(({ player, index = 0, maxRuns = 300, maxWickets = 20 }) 
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.5, delay: (index % 6) * 0.07, ease: [0.16, 1, 0.3, 1] }}
-      whileHover={{ y: -6, scale: 1.02 }}
+      whileHover={{ y: -7, scale: 1.05 }}
       style={{ rotateX, rotateY, transformPerspective: 900, transformStyle: 'preserve-3d' }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}

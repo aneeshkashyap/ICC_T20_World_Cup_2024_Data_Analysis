@@ -43,7 +43,7 @@ const TeamCard = memo(({ team, wins, rank, group, flag }) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.45, ease: 'easeOut' }}
-      whileHover={{ y: -5, scale: 1.015 }}
+      whileHover={{ y: -6, scale: 1.05 }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className="team-card rounded-2xl p-6 flex flex-col items-center gap-4 relative overflow-hidden cursor-default"

@@ -79,10 +79,10 @@ const MatchCard = memo(({ match, onClick, index = 0 }) => {
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.45, delay: (index % 6) * 0.06, ease: 'easeOut' }}
-      whileHover={{ y: -6, scale: 1.02, boxShadow: '0 20px 48px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,215,0,0.22), 0 0 24px rgba(255,215,0,0.10)' }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={{ y: -6, scale: 1.05, boxShadow: '0 24px 56px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,215,0,0.28), 0 0 32px rgba(255,215,0,0.12)' }}
+      whileTap={{ scale: 0.97 }}
       onClick={handleClick}
-      className="bg-[#122B5A] w-full text-center rounded-xl shadow-md overflow-hidden flex flex-col items-center group focus:outline-none focus:ring-2 focus:ring-icc-gold/50 cursor-pointer"
+      className="match-card w-full text-center rounded-xl overflow-hidden flex flex-col items-center group focus:outline-none focus:ring-2 focus:ring-icc-gold/50 cursor-pointer"
       aria-label={`Match: ${team1} vs ${team2}`}
     >
       {/* Shimmer top border — brightens on hover */}

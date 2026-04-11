@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, memo, useId } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { getFlag } from '../utils';
 import FilterBar        from '../components/FilterBar';
 import TeamSection      from '../components/TeamSection';
@@ -184,6 +184,10 @@ const Dashboard = () => {
   const [view,         setView]         = useState('grid'); // 'grid' | 'table' | 'teams'
   const [heroMatch,    setHeroMatch]    = useState(null);
 
+  /* ── Hero parallax ── */
+  const { scrollY } = useScroll();
+  const heroParallaxY = useTransform(scrollY, [0, 900], [0, 80]);
+
   const search = useDebounce(rawSearch, 250);
 
   const allPlayers = players || [];
@@ -251,8 +255,20 @@ const Dashboard = () => {
       transition={{ duration: 0.6 }}
     >
       {/* ══════ HERO (cinematic split) ══════ */}
-      <section id="hero" aria-labelledby="hero-heading" className="hero-stadium"
-        style={{ backgroundImage: `url(${import.meta.env.BASE_URL}stadium.png)` }}>
+      <section id="hero" aria-labelledby="hero-heading" className="hero-stadium">
+        {/* Parallax stadium background */}
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none"
+          style={{
+            position: 'absolute',
+            top: '-12%', left: 0, right: 0, bottom: '-12%',
+            backgroundImage: `url(${import.meta.env.BASE_URL}stadium.png)`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 30%',
+            y: heroParallaxY,
+          }}
+        />
         {/* Dark cinematic overlay */}
         <div className="hero-overlay" aria-hidden="true" />
 
@@ -335,17 +351,17 @@ const Dashboard = () => {
                 className="flex flex-wrap gap-4 pt-2"
               >
                 <motion.a href="#matches"
-                  whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
+                  whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.96 }}
                   className="btn-gold">
                   View Matches
                 </motion.a>
                 <motion.a href="#players"
-                  whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
+                  whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.96 }}
                   className="btn-outline-gold">
                   Explore Players
                 </motion.a>
                 <motion.a href="#analytics"
-                  whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}
+                  whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.96 }}
                   className="btn-outline-gold">
                   Analytics
                 </motion.a>
@@ -391,25 +407,38 @@ const Dashboard = () => {
         aria-label="Key tournament statistics">
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
           <SectionHeader eyebrow="By the Numbers" title="Tournament Stats" id="kpi-heading" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
-            role="list" aria-labelledby="kpi-heading">
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+            role="list" aria-labelledby="kpi-heading"
+            variants={{ show: { transition: { staggerChildren: 0.1 } } }}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-60px' }}
+          >
             {kpis.map((kpi, i) => (
-              <div key={kpi.label} role="listitem">
-                <KPICard {...kpi} delay={i * 0.1} />
-              </div>
+              <motion.div key={kpi.label} role="listitem"
+                variants={{ hidden: { opacity: 0, y: 32 }, show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } } }}>
+                <KPICard {...kpi} delay={0} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ══════ MATCHES ══════ */}
       <ErrorBoundary fallbackMessage="Matches grid failed to load.">
-        <section className="bg-icc-dark border-b border-icc-border/40">
+        <motion.section
+          className="bg-icc-dark border-b border-icc-border/40"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.7 }}
+        >
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-16">
             <SectionHeader eyebrow="Full Results" title="Tournament Matches" id="matches-heading" />
           </div>
           <MatchesGrid matches={matches || []} loading={mLoad} error={mErr} />
-        </section>
+        </motion.section>
       </ErrorBoundary>
 
       {/* ══════ ANALYTICS (Recharts) ══════ */}
@@ -436,8 +465,13 @@ const Dashboard = () => {
 
       {/* ══════ PLAYERS ══════ */}
       <ErrorBoundary fallbackMessage="Players section failed to load.">
-        <section id="players" aria-labelledby={filterTitleId}
-        className="bg-icc-dark py-16 border-b border-icc-border/40">
+        <motion.section id="players" aria-labelledby={filterTitleId}
+        className="bg-icc-dark py-16 border-b border-icc-border/40"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-80px' }}
+        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+        >
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
           <SectionHeader eyebrow="Top Performers" title="Players" id={filterTitleId} />
 
@@ -572,33 +606,36 @@ const Dashboard = () => {
             )}
           </AnimatePresence>
         </div>
-      </section>
+      </motion.section>
       </ErrorBoundary>
-
-      {/* ══════ TEAMS ══════ */}
       <ErrorBoundary fallbackMessage="Team rankings failed to load.">
-        <section id="teams" aria-labelledby="teams-heading"
-          className="bg-icc-navy/50 py-16 border-b border-icc-border/40">
+        <motion.section id="teams" aria-labelledby="teams-heading"
+          className="bg-icc-navy/50 py-16 border-b border-icc-border/40"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+        >
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
             <SectionHeader eyebrow="2024 Tournament" title="Team Rankings" id="teams-heading" />
-            <div role="list" aria-label="Team cards"
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {teamsForCards.map((t, i) => (
+            <motion.div role="list" aria-label="Team cards"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              variants={{ show: { transition: { staggerChildren: 0.09 } } }}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: '-40px' }}
+            >
+              {teamsForCards.map((t) => (
                 <motion.div key={t.team} role="listitem"
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.45, delay: (i % 3) * 0.1 }}>
+                  variants={{ hidden: { opacity: 0, y: 28 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } }}>
                   <TeamCard team={t.team} wins={t.wins} rank={t.rank}
                     group={t.group} flag={t.flag} />
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
-        </section>
+        </motion.section>
       </ErrorBoundary>
-
-      {/* ══════ STATS LEADERBOARD ══════ */}
       <ErrorBoundary fallbackMessage="Stats leaderboard failed to load.">
         <StatsSection batters={appData.topBatters || []} bowlers={appData.topBowlers || []} loading={false} />
       </ErrorBoundary>

@@ -1,9 +1,15 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const ROLES = ['All', 'Batsman', 'Bowler', 'All-rounder'];
 
 const FilterBar = ({ teams = [], selectedTeam, selectedRole, search, onTeamChange, onRoleChange, onSearch }) => (
-  <div className="flex flex-col gap-3 pb-4">
+  <motion.div
+    initial={{ opacity: 0, y: 12 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4 }}
+    className="flex flex-col gap-3 pb-4"
+  >
     {/* Search */}
     <div className="relative">
       <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-icc-muted"
@@ -16,7 +22,7 @@ const FilterBar = ({ teams = [], selectedTeam, selectedRole, search, onTeamChang
         value={search}
         onChange={e => onSearch(e.target.value)}
         placeholder="Search player or team..."
-        className="w-full pl-8 pr-4 py-2 bg-icc-card border border-icc-border rounded-lg text-sm text-white placeholder-icc-muted outline-none focus:border-icc-gold/40 transition-colors"
+        className="w-full pl-8 pr-4 py-2 bg-icc-card border border-icc-border rounded-lg text-sm text-white placeholder-icc-muted outline-none focus:border-icc-gold/40 focus:ring-1 focus:ring-icc-gold/20 transition-all duration-200"
       />
     </div>
 
@@ -24,13 +30,15 @@ const FilterBar = ({ teams = [], selectedTeam, selectedRole, search, onTeamChang
     <div className="flex flex-wrap items-center gap-2">
       <span className="text-[10px] font-bold text-icc-muted uppercase tracking-widest mr-1">Team</span>
       {['All Teams', ...teams].map(team => (
-        <button
+        <motion.button
           key={team}
+          whileHover={{ scale: 1.07 }}
+          whileTap={{ scale: 0.93 }}
           onClick={() => onTeamChange(team)}
           className={`filter-pill ${selectedTeam === team ? 'filter-pill-active' : ''}`}
         >
           {team}
-        </button>
+        </motion.button>
       ))}
     </div>
 
@@ -38,16 +46,18 @@ const FilterBar = ({ teams = [], selectedTeam, selectedRole, search, onTeamChang
     <div className="flex flex-wrap items-center gap-2">
       <span className="text-[10px] font-bold text-icc-muted uppercase tracking-widest mr-1">Role</span>
       {ROLES.map(role => (
-        <button
+        <motion.button
           key={role}
+          whileHover={{ scale: 1.07 }}
+          whileTap={{ scale: 0.93 }}
           onClick={() => onRoleChange(role)}
           className={`filter-pill ${selectedRole === role ? 'filter-pill-active' : ''}`}
         >
           {role}
-        </button>
+        </motion.button>
       ))}
     </div>
-  </div>
+  </motion.div>
 );
 
 export default FilterBar;

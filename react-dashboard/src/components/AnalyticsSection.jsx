@@ -1,5 +1,5 @@
 import React, { memo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   Cell, LabelList,
@@ -116,58 +116,81 @@ const AnalyticsSection = memo(({ batters = [], bowlers = [] }) => {
           <div className="inline-flex gap-1 p-1.5 rounded-2xl bg-icc-navy/60 border border-icc-border"
             role="tablist" aria-label="Analytics tabs">
             {Object.entries(charts).map(([key, { label, icon }]) => (
-              <button key={key}
+              <motion.button key={key}
                 role="tab"
                 aria-selected={tab === key}
+                whileHover={{ scale: 1.06 }}
+                whileTap={{ scale: 0.94 }}
                 onClick={() => setTab(key)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200
+                className={`relative px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors duration-200
                   ${tab === key
                     ? 'bg-icc-gold text-icc-dark shadow-md'
                     : 'text-icc-muted hover:text-white'}`}>
-                <span aria-hidden="true">{icon} </span>{label}
-              </button>
+                <motion.span
+                  aria-hidden="true"
+                  className="inline-block mr-1"
+                  whileHover={{ rotate: [0, -10, 10, 0], scale: 1.2 }}
+                  transition={{ duration: 0.35 }}
+                >{icon} </motion.span>{label}
+              </motion.button>
             ))}
           </div>
         </div>
 
-        {/* Main chart */}
+        {/* Main chart — AnimatePresence for smooth tab cross-fade */}
         <AnimCard delay={0}>
           <p className="text-xs font-bold uppercase tracking-widest text-icc-muted">
             {current.icon} {current.label}
           </p>
-          <motion.div
-            key={tab}
-            initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.35 }}
-          >
-            <ChartPanel
-              data={current.data}
-              dataKey={current.dataKey}
-              unit={current.unit}
-              label={current.label}
-            />
-          </motion.div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={tab}
+              initial={{ opacity: 0, y: 16, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <ChartPanel
+                data={current.data}
+                dataKey={current.dataKey}
+                unit={current.unit}
+                label={current.label}
+              />
+            </motion.div>
+          </AnimatePresence>
         </AnimCard>
 
-        {/* Mini stat cards row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+        {/* Mini stat cards — stagger entrance */}
+        <motion.div
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6"
+          variants={{ show: { transition: { staggerChildren: 0.09 } } }}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: '-40px' }}
+        >
           {[
             { label: 'Top Score',   value: batters[0]?.runs,             sub: batters[0]?.striker?.split(' ').pop(),  icon: '🏏', color: 'text-icc-gold' },
             { label: 'Top Wickets', value: bowlers[0]?.wickets,          sub: bowlers[0]?.bowler?.split(' ').pop(),   icon: '⚡', color: 'text-green-400' },
             { label: 'Best SR',     value: srData[0]?.value,             sub: srData[0]?.name,                        icon: '💥', color: 'text-blue-400' },
             { label: 'Best Econ',   value: econData[econData.length-1]?.value, sub: econData[econData.length-1]?.name, icon: '🎯', color: 'text-purple-400' },
-          ].map((stat, idx) => (
-            <AnimCard key={stat.label} delay={idx * 0.08}>
-              <span className="text-xl" aria-hidden="true">{stat.icon}</span>
-              <div>
-                <p className={`font-condensed font-black text-3xl ${stat.color}`}>{stat.value ?? '—'}</p>
-                <p className="text-xs font-bold text-white uppercase tracking-wider mt-0.5">{stat.label}</p>
-                <p className="text-[10px] text-icc-muted mt-0.5 truncate">{stat.sub ?? ''}</p>
-              </div>
-            </AnimCard>
+          ].map((stat) => (
+            <motion.div key={stat.label}
+              variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } }}
+            >
+              <AnimCard delay={0}>
+                <motion.span className="text-xl inline-block" aria-hidden="true"
+                  whileHover={{ scale: 1.3, rotate: -5 }} transition={{ duration: 0.25 }}>
+                  {stat.icon}
+                </motion.span>
+                <div>
+                  <p className={`font-condensed font-black text-3xl ${stat.color}`}>{stat.value ?? '—'}</p>
+                  <p className="text-xs font-bold text-white uppercase tracking-wider mt-0.5">{stat.label}</p>
+                  <p className="text-[10px] text-icc-muted mt-0.5 truncate">{stat.sub ?? ''}</p>
+                </div>
+              </AnimCard>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
