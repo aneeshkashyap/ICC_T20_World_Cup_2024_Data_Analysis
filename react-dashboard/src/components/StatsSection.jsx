@@ -1,6 +1,12 @@
 import React, { useState, useCallback, useMemo, memo } from 'react';
+import { motion } from 'framer-motion';
 import { getFlag } from '../utils';
 import { StatsTableSkeleton, EmptyState } from './Skeletons';
+
+const rowVars = {
+  hidden: { opacity: 0, x: -12 },
+  show: i => ({ opacity: 1, x: 0, transition: { duration: 0.35, delay: i * 0.04, ease: 'easeOut' } }),
+};
 
 /* ─── Helpers ─── */
 const srColor   = sr  => sr >= 150 ? 'text-green-400 font-bold' : sr >= 120 ? 'text-amber-400 font-bold' : 'text-white';
@@ -125,7 +131,13 @@ const BattingTable = memo(({ batters, loading }) => {
           {sorted.map((b, idx) => {
             const sr = b.strike_rate ?? b.strikeRate;
             return (
-              <tr key={b.striker || idx} className="hover:bg-white/[0.03] transition-colors">
+              <motion.tr key={b.striker || idx}
+                custom={idx}
+                variants={rowVars}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: '-20px' }}
+                className="hover:bg-white/[0.03] transition-colors">
                 <td className="td-cell text-center" headers="rank">
                   <MedalIcon rank={idx + 1} />
                 </td>
@@ -144,7 +156,7 @@ const BattingTable = memo(({ batters, loading }) => {
                   <ProgressBar value={b.runs || 0} max={maxRuns} color="bg-icc-gold"
                     label={`${b.runs} runs out of max ${maxRuns}`} />
                 </td>
-              </tr>
+            </motion.tr>
             );
           })}
         </tbody>
@@ -197,7 +209,13 @@ const BowlingTable = memo(({ bowlers, loading }) => {
         </thead>
         <tbody>
           {sorted.map((b, idx) => (
-            <tr key={b.bowler || idx} className="hover:bg-white/[0.03] transition-colors">
+            <motion.tr key={b.bowler || idx}
+              custom={idx}
+              variants={rowVars}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: '-20px' }}
+              className="hover:bg-white/[0.03] transition-colors">
               <td className="td-cell text-center"><MedalIcon rank={idx + 1} /></td>
               <td className="td-cell font-semibold text-white">{b.bowler}</td>
               <td className="td-cell"><TeamCell team={b.team} /></td>
@@ -214,7 +232,7 @@ const BowlingTable = memo(({ bowlers, loading }) => {
                 <ProgressBar value={b.wickets || 0} max={maxWkts} color="bg-green-500"
                   label={`${b.wickets} wickets out of max ${maxWkts}`} />
               </td>
-            </tr>
+            </motion.tr>
           ))}
         </tbody>
       </table>

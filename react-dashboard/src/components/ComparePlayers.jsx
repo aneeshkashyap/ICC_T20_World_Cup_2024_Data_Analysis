@@ -186,6 +186,21 @@ const ComparePlayers = ({ players = [] }) => {
     ];
   }, [canCompare, playerA, playerB]);
 
+  /* Count which player wins more stat categories */
+  const verdict = useMemo(() => {
+    if (!canCompare || stats.length === 0) return null;
+    let winsA = 0, winsB = 0;
+    stats.forEach(({ a, b, higherIsBetter }) => {
+      const na = parseFloat(a) || 0;
+      const nb = parseFloat(b) || 0;
+      if (na === nb) return;
+      if (higherIsBetter) { na > nb ? winsA++ : winsB++; }
+      else { (na > 0 && na < nb) || nb === 0 ? winsA++ : winsB++; }
+    });
+    if (winsA === winsB) return { draw: true, winsA, winsB };
+    return { winner: winsA > winsB ? playerA : playerB, winsA, winsB, draw: false };
+  }, [canCompare, stats, playerA, playerB]);
+
   return (
     <section
       id="compare"
@@ -287,6 +302,46 @@ const ComparePlayers = ({ players = [] }) => {
                     />
                   ))}
                 </div>
+
+                {/* ── Overall Verdict ── */}
+                {verdict && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: 0.15 }}
+                    className={`mt-4 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-center gap-3 text-center
+                      ${verdict.draw
+                        ? 'bg-white/[0.04] border border-white/10'
+                        : 'bg-icc-gold/[0.08] border border-icc-gold/30'}`}
+                  >
+                    {verdict.draw ? (
+                      <>
+                        <span className="text-2xl" aria-hidden="true">🤝</span>
+                        <div>
+                          <p className="font-condensed font-black text-lg text-white uppercase tracking-wide">It's a Draw!</p>
+                          <p className="text-xs text-icc-muted mt-0.5">
+                            Both players won <span className="text-white font-bold">{verdict.winsA}</span> stat{verdict.winsA !== 1 ? 's' : ''} each.
+                          </p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-2xl" aria-hidden="true">🏆</span>
+                        <div>
+                          <p className="text-[10px] text-icc-gold/70 uppercase tracking-widest font-bold mb-0.5">Overall Winner</p>
+                          <p className="font-condensed font-black text-xl text-icc-gold uppercase tracking-wide">
+                            {verdict.winner.name}
+                          </p>
+                          <p className="text-xs text-icc-muted mt-0.5">
+                            Won <span className="text-icc-gold font-bold">
+                              {verdict.winner === playerA ? verdict.winsA : verdict.winsB}
+                            </span> out of {stats.length} categories
+                          </p>
+                        </div>
+                      </>
+                    )}
+                  </motion.div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
