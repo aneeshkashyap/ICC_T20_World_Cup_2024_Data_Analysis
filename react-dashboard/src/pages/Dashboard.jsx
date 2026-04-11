@@ -432,10 +432,10 @@ const Dashboard = () => {
       <ErrorBoundary fallbackMessage="Matches grid failed to load.">
         <motion.section
           className="bg-icc-dark border-b border-icc-border/40"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-16">
             <SectionHeader eyebrow="Full Results" title="Tournament Matches" id="matches-heading" />
@@ -446,24 +446,45 @@ const Dashboard = () => {
 
       {/* ══════ ANALYTICS (Recharts) ══════ */}
       <ErrorBoundary fallbackMessage="Analytics charts failed to load.">
-        <AnalyticsSection
-          batters={appData.topBatters || []}
-          bowlers={appData.topBowlers || []}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <AnalyticsSection
+            batters={appData.topBatters || []}
+            bowlers={appData.topBowlers || []}
+          />
+        </motion.div>
       </ErrorBoundary>
 
       {/* ══════ COMPARE PLAYERS ══════ */}
       <ErrorBoundary fallbackMessage="Player comparison failed to load.">
-        <ComparePlayers players={allPlayers} />
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <ComparePlayers players={allPlayers} />
+        </motion.div>
       </ErrorBoundary>
 
       {/* ══════ MATCH PREDICTOR ══════ */}
       <ErrorBoundary fallbackMessage="Match predictor failed to load.">
-        <MatchPredictor
-          teamWins={appData.teamWins || []}
-          topBatters={appData.topBatters || []}
-          topBowlers={appData.topBowlers || []}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <MatchPredictor
+            teamWins={appData.teamWins || []}
+            topBatters={appData.topBatters || []}
+            topBowlers={appData.topBowlers || []}
+          />
+        </motion.div>
       </ErrorBoundary>
 
       {/* ══════ PLAYERS ══════ */}

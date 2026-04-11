@@ -123,7 +123,7 @@ const MatchCard = memo(({ match, onClick, index = 0 }) => {
             <div className={`flex flex-col items-center ${team1Won ? '' : 'opacity-60'}`}>
               {inn1 ? (
                 <>
-                  <span className={`text-2xl font-black tabular-nums leading-tight
+                  <span className={`text-3xl font-black tabular-nums leading-none
                     ${team1Won ? 'text-icc-gold drop-shadow-[0_0_8px_rgba(255,215,0,0.35)]' : 'text-white'}`}>
                     {inn1.runs}/{inn1.wickets}
                   </span>
@@ -141,7 +141,7 @@ const MatchCard = memo(({ match, onClick, index = 0 }) => {
             <div className={`flex flex-col items-center ${team2Won ? '' : 'opacity-60'}`}>
               {inn2 ? (
                 <>
-                  <span className={`text-2xl font-black tabular-nums leading-tight
+                  <span className={`text-3xl font-black tabular-nums leading-none
                     ${team2Won ? 'text-icc-gold drop-shadow-[0_0_8px_rgba(255,215,0,0.35)]' : 'text-white'}`}>
                     {inn2.runs}/{inn2.wickets}
                   </span>

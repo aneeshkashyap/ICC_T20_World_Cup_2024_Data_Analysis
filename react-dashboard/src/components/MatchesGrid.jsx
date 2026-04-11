@@ -197,14 +197,19 @@ const MatchesGrid = memo(({ matches = [], loading = false, error = null }) => {
                 <motion.ol
                   key="grid"
                   layout
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  variants={{ show: { transition: { staggerChildren: 0.07 } } }}
+                  initial="hidden"
+                  animate="show"
+                  exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                   className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 list-none p-0"
                   aria-label={`${visible.length} of ${filtered.length} matches`}
                 >
                   <AnimatePresence mode="popLayout">
                     {visible.map((match, idx) => (
-                      <motion.li key={match.match_num} layout exit={{ opacity: 0, scale: 0.95 }}>
+                      <motion.li key={match.match_num} layout
+                        variants={{ hidden: { opacity: 0, y: 28, scale: 0.97 }, show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } } }}
+                        exit={{ opacity: 0, scale: 0.95 }}>
                         <MatchCard match={match} onClick={setSelectedMatch} index={idx} />
                       </motion.li>
                     ))}
