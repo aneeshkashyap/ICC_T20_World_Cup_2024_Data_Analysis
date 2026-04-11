@@ -18,6 +18,7 @@ import ComparePlayers   from '../components/ComparePlayers';
 import MatchPredictor   from '../components/MatchPredictor';
 import { useDeferredData, useDebounce } from '../hooks';
 import appData from '../data.json';
+import scorecards from '../scorecards.json';
 import { PLAYER_PHOTOS } from '../playerPhotos';
 
 /* ─── Constants ─── */
@@ -59,22 +60,106 @@ const normalizeTeams = (t1, t2) => {
 };
 
 /* ─── Data builders ─── */
+const slugify = (value = '') => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+/* Build a reliable player → team map from full scorecards (data.json topBatters/topBowlers lacks team fields) */
+const buildPlayerMeta = () => {
+  const meta = {};
+
+  Object.values(scorecards || {}).forEach((inningsList = []) => {
+    inningsList.forEach(inn => {
+      (inn.batting || []).forEach(row => {
+        const name = row?.name?.trim();
+        if (!name) return;
+        if (!meta[name]) meta[name] = {
+          team: '', battingInnings: 0, bowlingInnings: 0, battingRuns: 0, bowlingWickets: 0,
+        };
+        if (!meta[name].team && inn.batting_team) meta[name].team = inn.batting_team;
+        meta[name].battingInnings += 1;
+        meta[name].battingRuns += Number(row.runs || 0);
+      });
+
+      (inn.bowling || []).forEach(row => {
+        const name = row?.name?.trim();
+        if (!name) return;
+        if (!meta[name]) meta[name] = {
+          team: '', battingInnings: 0, bowlingInnings: 0, battingRuns: 0, bowlingWickets: 0,
+        };
+        if (!meta[name].team && inn.bowling_team) meta[name].team = inn.bowling_team;
+        meta[name].bowlingInnings += 1;
+        meta[name].bowlingWickets += Number(row.wickets || 0);
+      });
+    });
+  });
+
+  return meta;
+};
+
+const PLAYER_META = buildPlayerMeta();
+const KNOWN_ALL_ROUNDERS = new Set([
+  'HH Pandya', 'MP Stoinis', 'AD Russell', 'Rashid Khan', 'Rishad Hossain',
+  'AR Patel', 'RA Jadeja', 'Shakib Al Hasan', 'Mohammad Nabi',
+]);
+
+const inferRole = (name, fallbackRole) => {
+  const meta = PLAYER_META[name];
+  if (KNOWN_ALL_ROUNDERS.has(name)) return 'All-rounder';
+  if (meta && meta.battingRuns >= 60 && meta.bowlingWickets >= 4) return 'All-rounder';
+  return fallbackRole;
+};
+
 const buildPlayers = () => {
-  const batters = (appData.topBatters || []).map(b => ({
-    id: `bat-${b.striker}`, name: b.striker,
-    team: b.team || '', teamFlag: TEAM_FLAGS[b.team] || '',
-    role: 'Batsman', runs: b.runs, balls: b.balls, fours: b.fours, sixes: b.sixes,
-    strikeRate: b.strike_rate != null ? Number(b.strike_rate).toFixed(1) : null,
-    wickets: null, economy: null, matches: b.innings || null, image: PLAYER_PHOTOS[b.striker] || null,
-  }));
-  const bowlers = (appData.topBowlers || []).map(b => ({
-    id: `bowl-${b.bowler}`, name: b.bowler,
-    team: b.team || '', teamFlag: TEAM_FLAGS[b.team] || '',
-    role: 'Bowler', runs: b.runs_given ?? null, wickets: b.wickets,
-    economy: b.economy != null ? Number(b.economy).toFixed(2) : null,
-    strikeRate: null, matches: b.innings || null, image: PLAYER_PHOTOS[b.bowler] || null,
-  }));
-  return [...batters, ...bowlers];
+  const players = new Map();
+
+  (appData.topBatters || []).forEach(b => {
+    const name = b.striker;
+    const meta = PLAYER_META[name] || {};
+    const team = meta.team || b.team || '';
+    const existing = players.get(name) || {};
+
+    players.set(name, {
+      id: existing.id || `player-${slugify(name)}`,
+      name,
+      team,
+      teamFlag: TEAM_FLAGS[team] || '',
+      role: inferRole(name, 'Batsman'),
+      runs: b.runs ?? existing.runs ?? null,
+      balls: b.balls ?? existing.balls ?? null,
+      fours: b.fours ?? existing.fours ?? null,
+      sixes: b.sixes ?? existing.sixes ?? null,
+      strikeRate: b.strike_rate != null ? Number(b.strike_rate).toFixed(1) : existing.strikeRate ?? null,
+      wickets: existing.wickets ?? null,
+      economy: existing.economy ?? null,
+      matches: meta.battingInnings || b.innings || existing.matches || null,
+      image: PLAYER_PHOTOS[name] || existing.image || null,
+    });
+  });
+
+  (appData.topBowlers || []).forEach(b => {
+    const name = b.bowler;
+    const meta = PLAYER_META[name] || {};
+    const team = meta.team || b.team || '';
+    const existing = players.get(name) || {};
+
+    players.set(name, {
+      id: existing.id || `player-${slugify(name)}`,
+      name,
+      team,
+      teamFlag: TEAM_FLAGS[team] || '',
+      role: inferRole(name, 'Bowler'),
+      runs: existing.runs ?? null,
+      balls: existing.balls ?? b.balls ?? null,
+      fours: existing.fours ?? null,
+      sixes: existing.sixes ?? null,
+      strikeRate: existing.strikeRate ?? null,
+      wickets: b.wickets ?? existing.wickets ?? null,
+      economy: b.economy != null ? Number(b.economy).toFixed(2) : existing.economy ?? null,
+      matches: meta.bowlingInnings || b.innings || existing.matches || null,
+      image: PLAYER_PHOTOS[name] || existing.image || null,
+    });
+  });
+
+  return Array.from(players.values());
 };
 
 const buildMatches = () =>
