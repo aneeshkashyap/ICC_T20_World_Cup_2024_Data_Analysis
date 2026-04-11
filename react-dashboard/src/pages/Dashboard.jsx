@@ -374,17 +374,54 @@ const Dashboard = () => {
         {/* Dark cinematic overlay */}
         <div className="hero-overlay" aria-hidden="true" />
 
-        {/* Radial gold glow - left side */}
-        <div className="absolute top-1/2 left-0 w-[500px] h-[500px] -translate-y-1/2
-                        bg-icc-gold/[0.03] rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+        {/* ── Background depth layers ── */}
+        {/* Gold radial glow — left */}
+        <div className="absolute top-1/2 left-0 w-[600px] h-[600px] -translate-y-1/2
+                        bg-icc-gold/[0.05] rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
+        {/* Blue radial glow — top-right */}
+        <div className="absolute top-0 right-0 w-[500px] h-[400px]
+                        bg-blue-600/[0.04] rounded-full blur-[100px] pointer-events-none" aria-hidden="true" />
+        {/* Subtle dot-grid overlay */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.025]"
+          aria-hidden="true"
+          style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+
+        {/* Floating cricket ball — right bg decoration */}
+        <motion.div
+          aria-hidden="true"
+          className="absolute right-[5%] top-[18%] w-48 h-48 opacity-[0.04] pointer-events-none hidden lg:block"
+          animate={{ y: [0, -18, 0], rotate: [0, 12, 0] }}
+          transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle cx="50" cy="50" r="47" fill="#cc2200" />
+            <path d="M50 3 Q72 26 50 50 Q28 74 50 97" stroke="#fff" strokeWidth="2.5" fill="none" opacity="0.6"/>
+            <path d="M50 3 Q28 26 50 50 Q72 74 50 97" stroke="#fff" strokeWidth="2.5" fill="none" opacity="0.6"/>
+            <path d="M3 50 Q26 28 50 50 Q74 72 97 50" stroke="#fff" strokeWidth="2.5" fill="none" opacity="0.6"/>
+            <path d="M3 50 Q26 72 50 50 Q74 28 97 50" stroke="#fff" strokeWidth="2.5" fill="none" opacity="0.6"/>
+          </svg>
+        </motion.div>
+        {/* Floating small ball — bottom-left */}
+        <motion.div
+          aria-hidden="true"
+          className="absolute left-[8%] bottom-[20%] w-20 h-20 opacity-[0.06] pointer-events-none hidden lg:block"
+          animate={{ y: [0, 12, 0], rotate: [0, -8, 0] }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+        >
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle cx="50" cy="50" r="47" fill="#FFD700" />
+            <path d="M50 3 Q72 26 50 50 Q28 74 50 97" stroke="#000" strokeWidth="3" fill="none" opacity="0.25"/>
+            <path d="M50 3 Q28 26 50 50 Q72 74 50 97" stroke="#000" strokeWidth="3" fill="none" opacity="0.25"/>
+          </svg>
+        </motion.div>
 
         <div className="relative w-full max-w-screen-xl mx-auto px-4 sm:px-8 py-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-            {/* ── LEFT: Title + CTAs ── */}
+            {/* ── LEFT: Title + Stats + CTAs ── */}
             <div className="flex flex-col gap-6">
 
-              {/* Badge */}
+              {/* Live badge */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -400,48 +437,68 @@ const Dashboard = () => {
                 </span>
               </motion.div>
 
-              {/* Main title */}
+              {/* Main title — multi-line with giant 2024 */}
               <motion.h1
                 id="hero-heading"
                 initial={{ opacity: 0, y: 32 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                className="font-condensed font-black text-[clamp(3rem,8vw,6.5rem)]
-                           text-white uppercase leading-[0.9] tracking-tight"
+                className="font-condensed font-black uppercase leading-[0.88] tracking-tight"
               >
-                T20<br />
-                World<br />
-                <span className="text-icc-gold">Cup</span>
+                <span className="block text-white text-[clamp(2.8rem,7vw,5.5rem)]">T20 World</span>
+                <span className="block text-white text-[clamp(2.8rem,7vw,5.5rem)]">Cup</span>
+                <span className="block text-icc-gold text-[clamp(4.5rem,13vw,10rem)] leading-[0.85]"
+                      style={{ textShadow: '0 0 80px rgba(255,215,0,0.25), 0 0 32px rgba(255,215,0,0.15)' }}>
+                  2024
+                </span>
               </motion.h1>
 
               {/* Subtitle */}
               <motion.p
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="text-base text-white/50 max-w-sm leading-relaxed font-light"
+                transition={{ duration: 0.6, delay: 0.38 }}
+                className="text-sm text-white/45 max-w-xs leading-relaxed font-light tracking-wide uppercase"
               >
-                Data-driven cricket insights — complete scorecards, player stats &amp; tournament analytics
-                from all 52 matches across USA &amp; West Indies.
+                ICC Men's T20 World Cup · Data Analysis
               </motion.p>
 
-              {/* Stat pills */}
+              {/* ── Animated KPI stat cards ── */}
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                className="flex flex-wrap gap-2"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="grid grid-cols-2 gap-3"
               >
                 {[
-                  { v: appData.totalMatches || 52,  l: 'Matches' },
-                  { v: appData.totalTeams   || 20,  l: 'Teams'   },
-                  { v: appData.totalRuns    || 0,   l: 'Runs'    },
-                ].map(({ v, l }) => (
-                  <div key={l} className="px-4 py-2 rounded-full featured-match-card
-                                          flex items-center gap-2">
-                    <span className="font-condensed font-black text-lg text-icc-gold">{v.toLocaleString()}</span>
-                    <span className="text-xs text-white/40 font-medium">{l}</span>
-                  </div>
+                  { value: appData.totalMatches || 52,   label: 'Matches',  icon: '🏏', grad: 'from-yellow-400 to-orange-500', dur: 1400 },
+                  { value: appData.totalRuns    || 12188, label: 'Total Runs', icon: '📈', grad: 'from-blue-400 to-cyan-400',    dur: 1800 },
+                  { value: appData.totalWickets || 684,  label: 'Wickets',  icon: '⚡', grad: 'from-purple-400 to-pink-400',   dur: 1600 },
+                  { value: appData.totalTeams   || 20,   label: 'Nations',  icon: '🌍', grad: 'from-emerald-400 to-green-400', dur: 1200 },
+                ].map(({ value, label, icon, grad, dur }) => (
+                  <motion.div
+                    key={label}
+                    whileHover={{ y: -3, scale: 1.03 }}
+                    transition={{ duration: 0.2 }}
+                    className="relative rounded-2xl px-4 py-3 flex flex-col gap-0.5 overflow-hidden"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)',
+                      backdropFilter: 'blur(16px)',
+                      WebkitBackdropFilter: 'blur(16px)',
+                      border: '1px solid rgba(255,255,255,0.10)',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)',
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-base">{icon}</span>
+                      <span className="text-[9px] text-white/30 uppercase tracking-widest font-bold">{label}</span>
+                    </div>
+                    <AnimatedNumber
+                      value={value}
+                      duration={dur}
+                      className={`font-condensed font-black text-2xl bg-gradient-to-r ${grad} bg-clip-text text-transparent`}
+                    />
+                  </motion.div>
                 ))}
               </motion.div>
 
@@ -449,21 +506,24 @@ const Dashboard = () => {
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-                className="flex flex-wrap gap-4 pt-2"
+                transition={{ duration: 0.6, delay: 0.65 }}
+                className="flex flex-wrap gap-3 pt-1"
               >
-                <motion.a href="#matches"
-                  whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.96 }}
-                  className="btn-gold">
-                  View Matches
+                <motion.a
+                  href="#matches"
+                  whileHover={{ scale: 1.07, boxShadow: '0 0 28px rgba(255,215,0,0.4)' }}
+                  whileTap={{ scale: 0.96 }}
+                  className="btn-gold"
+                >
+                  🏏 Explore Matches
                 </motion.a>
                 <motion.a href="#players"
-                  whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.96 }}
+                  whileHover={{ scale: 1.07 }} whileTap={{ scale: 0.96 }}
                   className="btn-outline-gold">
-                  Explore Players
+                  Player Stats
                 </motion.a>
                 <motion.a href="#analytics"
-                  whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.96 }}
+                  whileHover={{ scale: 1.07 }} whileTap={{ scale: 0.96 }}
                   className="btn-outline-gold">
                   Analytics
                 </motion.a>
@@ -473,7 +533,7 @@ const Dashboard = () => {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.8 }}
+                transition={{ duration: 0.5, delay: 0.85 }}
                 className="flex flex-wrap items-center gap-4 pt-2 border-t border-white/[0.06]"
               >
                 {['📍 USA & West Indies', '🏟️ 9 Venues', '🏆 India — Champions'].map(fact => (
