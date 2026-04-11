@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo, memo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, memo, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -163,7 +163,7 @@ const PlayerAvatar = memo(({ player, side, isWinner = false, winCount = 0, total
               className="absolute -top-6 left-1/2 -translate-x-1/2 text-xl select-none"
               aria-label="Winner"
             >
-              ðŸ‘‘
+              {String.fromCodePoint(0x1F451)}
             </motion.div>
           )}
         </AnimatePresence>
@@ -299,12 +299,12 @@ const PlayerSelect = memo(({ label, value, onChange, options, excludeId, id }) =
                    appearance-none cursor-pointer backdrop-blur-sm
                    ${value ? 'border-icc-gold/30' : 'border-white/10'}`}
       >
-        <option value="" className="bg-[#080f1e] text-white">Select playerâ€¦</option>
+        <option value="" className="bg-[#080f1e] text-white">Select player{String.fromCodePoint(0x2026)}</option>
         {options
           .filter(p => p.id !== excludeId)
           .map(p => (
             <option key={p.id} value={p.id} className="bg-[#080f1e] text-white">
-              {p.name} â€” {p.role}
+              {p.name} {String.fromCodePoint(0x2014)} {p.role}
             </option>
           ))}
       </select>
@@ -338,14 +338,14 @@ function buildInsights(playerA, playerB) {
       const diffPct = (diff / Math.max(runsA, runsB)) * 100;
       if (diffPct > 20) {
         const leader = runsA > runsB ? nameA : nameB;
-        lines.push({ icon: 'ðŸ', text: `${leader} is the stronger batsman, scoring ${diff} more run${diff !== 1 ? 's' : ''} this tournament.` });
+        lines.push({ icon: String.fromCodePoint(0x1F3CF), text: `${leader} is the stronger batsman, scoring ${diff} more run${diff !== 1 ? 's' : ''} this tournament.` });
       } else {
-        lines.push({ icon: 'ðŸ', text: `Bat for bat â€” both players are within ${Math.round(diffPct)}% of each other on runs.` });
+        lines.push({ icon: String.fromCodePoint(0x1F3CF), text: `Bat for bat \u2014 both players are within ${Math.round(diffPct)}% of each other on runs.` });
       }
     } else if (runsA > 0 && !batB) {
-      lines.push({ icon: 'ðŸ', text: `${nameA} is the specialist batsman here with ${runsA} runs.` });
+      lines.push({ icon: String.fromCodePoint(0x1F3CF), text: `${nameA} is the specialist batsman here with ${runsA} runs.` })
     } else if (runsB > 0 && !batA) {
-      lines.push({ icon: 'ðŸ', text: `${nameB} is the specialist batsman here with ${runsB} runs.` });
+      lines.push({ icon: String.fromCodePoint(0x1F3CF), text: `${nameB} is the specialist batsman here with ${runsB} runs.` })
     }
   }
 
@@ -359,14 +359,14 @@ function buildInsights(playerA, playerB) {
       if (wktsA !== wktsB) {
         const leader = wktsA > wktsB ? nameA : nameB;
         const diff   = Math.abs(wktsA - wktsB);
-        lines.push({ icon: 'ðŸŽ¯', text: `${leader} is the more dangerous bowler, taking ${diff} extra wicket${diff !== 1 ? 's' : ''}.` });
+        lines.push({ icon: String.fromCodePoint(0x1F3AF), text: `${leader} is the more dangerous bowler, taking ${diff} extra wicket${diff !== 1 ? 's' : ''}.` });
       } else {
-        lines.push({ icon: 'ðŸŽ¯', text: `Dead heat with the ball â€” both took ${wktsA} wicket${wktsA !== 1 ? 's' : ''}.` });
+        lines.push({ icon: String.fromCodePoint(0x1F3AF), text: `Dead heat with the ball \u2014 both took ${wktsA} wicket${wktsA !== 1 ? 's' : ''}.` });
       }
     } else if (wktsA > 0 && wktsB === 0) {
-      lines.push({ icon: 'ðŸŽ¯', text: `Only ${nameA} has taken wickets â€” the clear bowling threat.` });
+      lines.push({ icon: String.fromCodePoint(0x1F3AF), text: `Only ${nameA} has taken wickets \u2014 the clear bowling threat.` });
     } else if (wktsB > 0 && wktsA === 0) {
-      lines.push({ icon: 'ðŸŽ¯', text: `Only ${nameB} has taken wickets â€” the clear bowling threat.` });
+      lines.push({ icon: String.fromCodePoint(0x1F3AF), text: `Only ${nameB} has taken wickets \u2014 the clear bowling threat.` });
     }
   }
 
@@ -374,7 +374,7 @@ function buildInsights(playerA, playerB) {
   const srB = parseFloat(playerB.strikeRate) || 0;
   if (srA > 0 && srB > 0 && Math.abs(srA - srB) > 15) {
     const faster = srA > srB ? nameA : nameB;
-    lines.push({ icon: 'âš¡', text: `${faster} attacks at a noticeably higher strike rate, bringing extra explosive power.` });
+    lines.push({ icon: String.fromCodePoint(0x26A1), text: `${faster} attacks at a noticeably higher strike rate, bringing extra explosive power.` });
   }
 
   return lines.slice(0, 3);
@@ -530,7 +530,7 @@ const ComparePlayers = ({ players = [], defaultIdA = '', defaultIdB = '' }) => {
                   className="text-4xl select-none"
                   aria-hidden="true"
                 >
-                  âš–ï¸
+                  {String.fromCodePoint(0x2696, 0xFE0F)}
                 </motion.p>
                 <p className="text-sm text-icc-muted text-center max-w-xs leading-relaxed">
                   Select two players above to compare their stats head-to-head.
@@ -645,7 +645,7 @@ const ComparePlayers = ({ players = [], defaultIdA = '', defaultIdB = '' }) => {
                   >
                     {verdict.draw ? (
                       <div className="flex items-center justify-center gap-3">
-                        <span className="text-2xl select-none" aria-hidden="true">ðŸ¤</span>
+                        <span className="text-2xl select-none" aria-hidden="true">{String.fromCodePoint(0x1F91D)}</span>
                         <div className="text-center">
                           <p className="font-condensed font-black text-lg text-white
                                         uppercase tracking-wide">
@@ -661,7 +661,7 @@ const ComparePlayers = ({ players = [], defaultIdA = '', defaultIdB = '' }) => {
                     ) : (
                       <>
                         <div className="flex items-center justify-center gap-3 mb-5">
-                          <span className="text-2xl select-none" aria-hidden="true">ðŸ†</span>
+                          <span className="text-2xl select-none" aria-hidden="true">{String.fromCodePoint(0x1F3C6)}</span>
                           <div className="text-center">
                             <p className="text-[9px] text-emerald-400/65 uppercase
                                           tracking-widest font-bold mb-0.5">
