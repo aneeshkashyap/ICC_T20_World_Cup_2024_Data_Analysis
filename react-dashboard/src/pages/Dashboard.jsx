@@ -107,8 +107,11 @@ const KPICard = memo(({ icon, value, label, sub, delay = 0 }) => (
     role="group"
     aria-label={`${label}: ${Number(value).toLocaleString()}${sub ? `, ${sub}` : ''}`}
   >
-    <div className="w-12 h-12 rounded-xl bg-icc-gold/10 flex items-center justify-center text-2xl flex-shrink-0"
-      aria-hidden="true">{icon}</div>
+    <motion.div className="w-12 h-12 rounded-xl bg-icc-gold/10 flex items-center justify-center text-2xl flex-shrink-0"
+      aria-hidden="true"
+      whileHover={{ scale: 1.2, rotate: -8 }}
+      transition={{ duration: 0.2, type: 'spring', stiffness: 500 }}
+    >{icon}</motion.div>
     <div>
       <AnimatedNumber
         value={value}

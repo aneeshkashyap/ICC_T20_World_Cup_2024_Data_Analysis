@@ -204,6 +204,25 @@
     @apply bg-icc-gold text-icc-dark border-icc-gold;
   }
 
+  /* ── Team filter select ── */
+  .match-select {
+    @apply px-3 py-2 rounded-xl text-xs font-semibold text-white cursor-pointer
+           outline-none transition-all duration-200;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(30, 58, 110, 0.8);
+  }
+  .match-select:hover {
+    border-color: rgba(255,215,0,0.35);
+  }
+  .match-select:focus {
+    border-color: rgba(255,215,0,0.5);
+    box-shadow: 0 0 0 1px rgba(255,215,0,0.2);
+  }
+  .match-select option {
+    @apply bg-icc-dark text-white;
+  }
+
   /* ═══════════════════════════════════════════
      EYEBROW LABEL
   ═══════════════════════════════════════════ */

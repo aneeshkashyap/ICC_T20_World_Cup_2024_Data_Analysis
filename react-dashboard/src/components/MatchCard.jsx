@@ -111,7 +111,7 @@ const MatchCard = memo(({ match, onClick, index = 0 }) => {
           <div className={`flex flex-col items-center gap-1.5 w-16 flex-shrink-0 ${team1Won ? '' : 'opacity-60'}`}>
             <FlagImg team={team1}
               className="w-10 h-7 object-cover rounded-md border border-white/15 shadow" />
-            <span className={`text-[10px] font-bold uppercase text-center leading-tight w-full truncate
+            <span className={`text-xs font-semibold uppercase text-center leading-tight w-full truncate
               ${team1Won ? 'text-icc-gold' : 'text-white/80'}`}>
               {short(team1)}
             </span>
@@ -123,7 +123,7 @@ const MatchCard = memo(({ match, onClick, index = 0 }) => {
             <div className={`flex flex-col items-center ${team1Won ? '' : 'opacity-60'}`}>
               {inn1 ? (
                 <>
-                  <span className={`text-xl font-bold tabular-nums leading-tight
+                  <span className={`text-2xl font-black tabular-nums leading-tight
                     ${team1Won ? 'text-icc-gold drop-shadow-[0_0_8px_rgba(255,215,0,0.35)]' : 'text-white'}`}>
                     {inn1.runs}/{inn1.wickets}
                   </span>
@@ -141,7 +141,7 @@ const MatchCard = memo(({ match, onClick, index = 0 }) => {
             <div className={`flex flex-col items-center ${team2Won ? '' : 'opacity-60'}`}>
               {inn2 ? (
                 <>
-                  <span className={`text-xl font-bold tabular-nums leading-tight
+                  <span className={`text-2xl font-black tabular-nums leading-tight
                     ${team2Won ? 'text-icc-gold drop-shadow-[0_0_8px_rgba(255,215,0,0.35)]' : 'text-white'}`}>
                     {inn2.runs}/{inn2.wickets}
                   </span>
@@ -157,7 +157,7 @@ const MatchCard = memo(({ match, onClick, index = 0 }) => {
           <div className={`flex flex-col items-center gap-1.5 w-16 flex-shrink-0 ${team2Won ? '' : 'opacity-60'}`}>
             <FlagImg team={team2}
               className="w-10 h-7 object-cover rounded-md border border-white/15 shadow" />
-            <span className={`text-[10px] font-bold uppercase text-center leading-tight w-full truncate
+            <span className={`text-xs font-semibold uppercase text-center leading-tight w-full truncate
               ${team2Won ? 'text-icc-gold' : 'text-white/80'}`}>
               {short(team2)}
             </span>
@@ -197,4 +197,93 @@ const MatchCard = memo(({ match, onClick, index = 0 }) => {
 });
 
 MatchCard.displayName = 'MatchCard';
+
+/* ── ListMatchCard — compact single-row layout for list view ── */
+export const ListMatchCard = memo(({ match, onClick, index = 0 }) => {
+  const {
+    match_num, date, team1, team2, winner, margin,
+    player_of_match, match_type,
+  } = match;
+
+  const typePill  = TYPE_PILL[match_type] || 'pill-group';
+  const team1Won  = winner === team1;
+  const team2Won  = winner === team2;
+  const innings   = getInnings(match_num);
+  const inn1      = innings?.find(i => i.team === team1) ?? innings?.[0] ?? null;
+  const inn2      = innings?.find(i => i.team === team2) ?? innings?.[1] ?? null;
+  const handleClick = useCallback(() => onClick(match), [match, onClick]);
+
+  return (
+    <motion.button
+      layout
+      initial={{ opacity: 0, x: -16 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, margin: '-20px' }}
+      transition={{ duration: 0.3, delay: (index % 12) * 0.03, ease: 'easeOut' }}
+      whileHover={{ x: 4, backgroundColor: 'rgba(255,215,0,0.04)' }}
+      whileTap={{ scale: 0.99 }}
+      onClick={handleClick}
+      className="w-full text-left rounded-xl overflow-hidden group focus:outline-none focus:ring-2
+                 focus:ring-icc-gold/50 cursor-pointer border border-icc-border/60
+                 hover:border-icc-gold/30 transition-colors duration-200
+                 flex items-center gap-3 px-4 py-2.5"
+      style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(8px)' }}
+      aria-label={`Match: ${team1} vs ${team2}`}
+    >
+      {/* Type pill */}
+      <span className={`pill-tag text-[9px] flex-shrink-0 ${typePill}`}>{match_type}</span>
+
+      {/* Team 1 */}
+      <div className={`flex items-center gap-1.5 w-[88px] flex-shrink-0 ${team1Won ? '' : 'opacity-55'}`}>
+        <FlagImg team={team1} className="w-6 h-4 object-cover rounded border border-white/15" />
+        <span className={`text-[11px] font-semibold truncate ${team1Won ? 'text-icc-gold' : 'text-white/80'}`}>
+          {short(team1)}
+        </span>
+      </div>
+
+      {/* Score 1 */}
+      <span className={`text-sm font-black tabular-nums w-[60px] text-right flex-shrink-0 ${team1Won ? 'text-icc-gold' : 'text-white/70'}`}>
+        {inn1 ? `${inn1.runs}/${inn1.wickets}` : '—'}
+      </span>
+
+      <span className="text-[10px] font-bold text-gray-500 flex-shrink-0">vs</span>
+
+      {/* Score 2 */}
+      <span className={`text-sm font-black tabular-nums w-[60px] flex-shrink-0 ${team2Won ? 'text-icc-gold' : 'text-white/70'}`}>
+        {inn2 ? `${inn2.runs}/${inn2.wickets}` : '—'}
+      </span>
+
+      {/* Team 2 */}
+      <div className={`flex items-center gap-1.5 w-[88px] flex-shrink-0 ${team2Won ? '' : 'opacity-55'}`}>
+        <FlagImg team={team2} className="w-6 h-4 object-cover rounded border border-white/15" />
+        <span className={`text-[11px] font-semibold truncate ${team2Won ? 'text-icc-gold' : 'text-white/80'}`}>
+          {short(team2)}
+        </span>
+      </div>
+
+      {/* Result — fills remaining space */}
+      <p className="flex-1 text-[10px] text-green-400/80 font-medium truncate hidden sm:block">
+        {winner ? `${short(winner)} won by ${margin}` : 'No Result'}
+      </p>
+
+      {/* POTM */}
+      {player_of_match && (
+        <span className="text-[9px] text-icc-gold/60 truncate hidden md:block w-[100px] flex-shrink-0">
+          ⭐ {player_of_match}
+        </span>
+      )}
+
+      {/* Date */}
+      <span className="text-[9px] text-white/30 flex-shrink-0">{date}</span>
+
+      {/* CTA chevron */}
+      <svg className="w-3.5 h-3.5 text-white/20 group-hover:text-icc-gold transition-colors flex-shrink-0"
+        fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+      </svg>
+    </motion.button>
+  );
+});
+
+ListMatchCard.displayName = 'ListMatchCard';
 export default MatchCard;
