@@ -33,3 +33,35 @@ const teamFlagCodes = {
 export const getFlag = (teamName) => teamFlags[teamName] || 'https://flagcdn.com/w40/un.png';
 
 export const getFlagCode = (teamName) => teamFlagCodes[teamName] || 'un';
+
+/**
+ * Normalize a raw overs value (string or number) to a valid T20 overs string.
+ *
+ * Rules:
+ *  - The decimal part represents balls (0–5). Balls ≥ 6 carry over:
+ *      19.6 → 20.0    18.7 → 19.1
+ *  - Total overs (after normalization) are capped at 20.0.
+ *  - Returns '—' for null / undefined / NaN input.
+ *
+ * @param {string|number} raw
+ * @returns {string}  e.g. '17.3', '20.0'
+ */
+export const formatOvers = (raw) => {
+  const n = parseFloat(raw);
+  if (isNaN(n) || raw == null) return '—';
+
+  // Split into whole overs and balls (decimal digit)
+  const wholeOvers = Math.floor(n);
+  // Use one decimal digit: 13.14 → 1 ball, 19.6 → 6 balls
+  const balls = Math.round((n - wholeOvers) * 10);
+
+  // Convert total balls to overs + remainder
+  const totalBalls = wholeOvers * 6 + balls;
+  const normalizedOvers = Math.floor(totalBalls / 6);
+  const normalizedBalls = totalBalls % 6;
+
+  // Cap at 20.0
+  if (normalizedOvers >= 20) return '20.0';
+
+  return `${normalizedOvers}.${normalizedBalls}`;
+};

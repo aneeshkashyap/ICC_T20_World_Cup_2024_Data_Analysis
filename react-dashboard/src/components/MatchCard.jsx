@@ -1,6 +1,6 @@
 import React, { memo, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { getFlag } from '../utils';
+import { getFlag, formatOvers } from '../utils';
 import scorecards from '../scorecards.json';
 
 /* ── Fallback flag ── */
@@ -20,8 +20,8 @@ const FlagImg = ({ team, className }) => {
 
 const TYPE_PILL   = { Final: 'pill-final', 'Semi Final': 'pill-semi' };
 const short       = t => t.replace('United States of America', 'USA').replace('Papua New Guinea', 'PNG');
-// overs in scorecards.json are stored as strings — parse, cap at 20, format to 1dp
-const fmtOvers    = o => { const n = parseFloat(o); return isNaN(n) ? '—' : Math.min(n, 20).toFixed(1); };
+// Normalize overs via shared formatOvers (handles balls≥6, caps at 20.0)
+const fmtOvers    = o => formatOvers(o);
 
 /* Compute balls remaining when chasing team wins by wickets */
 const ballsLeft = (overs) => {

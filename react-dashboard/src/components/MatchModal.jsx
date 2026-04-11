@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getFlag, getFlagCode } from '../utils';
+import { getFlag, getFlagCode, formatOvers } from '../utils';
 import scorecards from '../scorecards.json';
 
 /* ─── Helpers ─── */
@@ -43,7 +43,7 @@ const BattingTable = ({ rows, total_runs, total_wickets, overs, extras }) => (
           <td colSpan={2} className="px-3 py-2 text-xs text-icc-muted">
             Extras: <span className="text-white font-semibold">{extras}</span>
             <span className="mx-2 text-icc-border">·</span>
-            Overs: <span className="text-white font-semibold">{overs}</span>
+            Overs: <span className="text-white font-semibold">{formatOvers(overs)}</span>
           </td>
           <td className="px-3 py-2 text-center">
             <span className="font-black text-icc-gold text-base">{total_runs}/{total_wickets}</span>
@@ -113,7 +113,7 @@ const InningPanel = ({ inning, active, onClick }) => (
       <span className={`font-condensed font-black text-xl ${active ? 'text-icc-gold' : 'text-white'}`}>
         {inning.total_runs}/{inning.total_wickets}
       </span>
-      <span className="text-[11px] text-icc-muted">({inning.overs} ov)</span>
+      <span className="text-[11px] text-icc-muted">({formatOvers(inning.overs)} ov)</span>
     </div>
   </button>
 );
@@ -248,7 +248,7 @@ const MatchModal = ({ match, onClose }) => {
                           {scorecardTab === 'batting' && (
                             <span className="font-condensed font-black text-icc-gold text-lg">
                               {currentInning.total_runs}/{currentInning.total_wickets}
-                              <span className="text-icc-muted text-xs font-normal ml-1.5">({currentInning.overs} ov)</span>
+                              <span className="text-icc-muted text-xs font-normal ml-1.5">({formatOvers(currentInning.overs)} ov)</span>
                             </span>
                           )}
                         </div>
@@ -258,7 +258,7 @@ const MatchModal = ({ match, onClose }) => {
                             rows={currentInning.batting}
                             total_runs={currentInning.total_runs}
                             total_wickets={currentInning.total_wickets}
-                            overs={currentInning.overs}
+                            overs={formatOvers(currentInning.overs)}
                             extras={currentInning.extras}
                           />
                         )}
