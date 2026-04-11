@@ -1,11 +1,38 @@
 /* eslint-disable react/display-name */
 // ─── Analytics Section — production-quality: charts, modal, team filter, insights ───
-import React, { memo, useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { memo, useState, useCallback, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   Cell, LabelList,
 } from 'recharts';
+
+/* ── Animated count-up number ── */
+const AnimatedValue = ({ value, duration = 0.8 }) => {
+  const motionVal = useMotionValue(0);
+  const springVal = useSpring(motionVal, { duration: duration * 1000, bounce: 0 });
+  const [display, setDisplay] = useState('0');
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const num = parseFloat(value);
+    if (isNaN(num)) { setDisplay(String(value ?? '—')); return; }
+    motionVal.set(num);
+  }, [value, motionVal]);
+
+  useEffect(() => {
+    const unsub = springVal.on('change', v => {
+      const num = parseFloat(value);
+      if (isNaN(num)) return;
+      // Preserve decimal places from the original value
+      const decimals = String(value).includes('.') ? String(value).split('.')[1].length : 0;
+      setDisplay(decimals > 0 ? v.toFixed(decimals) : Math.round(v).toLocaleString());
+    });
+    return unsub;
+  }, [springVal, value]);
+
+  return <span ref={ref}>{display}</span>;
+};
 
 /* ── Rich custom tooltip ── */
 const CustomTooltip = ({ active, payload, label, unit, rank }) => {
@@ -31,15 +58,23 @@ const CustomTooltip = ({ active, payload, label, unit, rank }) => {
   );
 };
 
-/* ── Animated, clickable bar chart ── */
+/* ── Animated, clickable bar chart with persistent selection ── */
 const ChartPanel = memo(({ data, dataKey, unit, accentColor = '#FFD700', height = 300, onBarClick }) => {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [hoveredIndex,  setHoveredIndex]  = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(null);
 
-  // Build a tooltip wrapper that knows the item's rank
+  // Reset selection when data changes (team filter)
+  useEffect(() => { setSelectedIndex(null); }, [data]);
+
   const TooltipWithRank = useCallback((props) => {
     const idx = data.findIndex(d => d.name === props.label);
     return <CustomTooltip {...props} unit={unit} rank={idx + 1} />;
   }, [data, unit]);
+
+  const handleClick = useCallback((barData, index) => {
+    setSelectedIndex(prev => prev === index ? null : index); // toggle
+    onBarClick?.(barData, index);
+  }, [onBarClick]);
 
   return (
     <ResponsiveContainer width="100%" height={height}>
@@ -64,26 +99,30 @@ const ChartPanel = memo(({ data, dataKey, unit, accentColor = '#FFD700', height 
           animationBegin={150}
           animationDuration={900}
           animationEasing="ease-out"
-          onClick={(barData, index) => onBarClick?.(barData, index)}
+          onClick={handleClick}
           style={{ cursor: onBarClick ? 'pointer' : 'default' }}
           onMouseEnter={(_, index) => setHoveredIndex(index)}
           onMouseLeave={() => setHoveredIndex(null)}
         >
-          {data.map((_, i) => (
-            <Cell
-              key={i}
-              fill={
-                i === 0
-                  ? accentColor
-                  : i === 1
-                  ? `${accentColor}CC`
-                  : i < 4
-                  ? `${accentColor}77`
-                  : `${accentColor}44`
-              }
-              opacity={hoveredIndex === null || hoveredIndex === i ? 1 : 0.55}
-            />
-          ))}
+          {data.map((_, i) => {
+            const isSelected = selectedIndex === i;
+            const isActive   = hoveredIndex === i;
+            const base = i === 0 ? accentColor : i === 1 ? `${accentColor}CC` : i < 4 ? `${accentColor}77` : `${accentColor}44`;
+            return (
+              <Cell
+                key={i}
+                fill={isSelected ? accentColor : base}
+                opacity={
+                  isSelected ? 1
+                  : selectedIndex !== null ? 0.35
+                  : hoveredIndex === null ? 1
+                  : isActive ? 1 : 0.5
+                }
+                stroke={isSelected ? '#fff' : 'none'}
+                strokeWidth={isSelected ? 1.5 : 0}
+              />
+            );
+          })}
           <LabelList dataKey={dataKey} position="top"
             style={{ fill: '#8B9CC8', fontSize: 9, fontWeight: 700 }} />
         </Bar>
@@ -114,12 +153,34 @@ const ROLE_GRADIENT = {
 
 const StatPill = ({ label, value, color = 'text-white' }) => (
   <div className="flex flex-col items-center gap-1 bg-white/5 rounded-xl px-4 py-3 min-w-[72px]">
-    <span className={`font-condensed font-black text-2xl ${color}`}>{value ?? '—'}</span>
+    <span className={`font-condensed font-black text-2xl ${color}`}>
+      <AnimatedValue value={value} />
+    </span>
     <span className="text-[10px] font-bold text-icc-muted uppercase tracking-widest">{label}</span>
   </div>
 );
 
-const PlayerModal = ({ player, onClose }) => {
+/* Comparison bar: player value vs max in field */
+const CompareBar = ({ label, playerVal, maxVal, color }) => {
+  const pct = maxVal > 0 ? Math.min((parseFloat(playerVal) / maxVal) * 100, 100) : 0;
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-[10px] text-icc-muted w-20 text-right flex-shrink-0 uppercase tracking-wide font-bold">{label}</span>
+      <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+        <motion.div
+          className="h-full rounded-full"
+          style={{ background: color }}
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+        />
+      </div>
+      <span className="text-[11px] font-black text-white w-12 flex-shrink-0">{playerVal ?? '—'}</span>
+    </div>
+  );
+};
+
+const PlayerModal = ({ player, onClose, fieldStats = {} }) => {
   // Close on Escape key
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
@@ -135,7 +196,7 @@ const PlayerModal = ({ player, onClose }) => {
     <motion.div
       key="modal-backdrop"
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(5,8,20,0.85)', backdropFilter: 'blur(8px)' }}
+      style={{ background: 'rgba(5,8,20,0.88)', backdropFilter: 'blur(10px)' }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -145,14 +206,14 @@ const PlayerModal = ({ player, onClose }) => {
       aria-label={`${player.name} stats`}
     >
       <motion.div
-        className={`relative w-full max-w-md rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-gradient-to-br ${grad}`}
+        className={`relative w-full max-w-lg rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-gradient-to-br ${grad}`}
         initial={{ opacity: 0, scale: 0.88, y: 32 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 24 }}
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
         onClick={e => e.stopPropagation()}
       >
-        {/* Close button */}
+        {/* Close */}
         <button
           onClick={onClose}
           aria-label="Close"
@@ -162,7 +223,7 @@ const PlayerModal = ({ player, onClose }) => {
           ✕
         </button>
 
-        {/* Image + header */}
+        {/* Header */}
         <div className="p-6 pb-4 flex items-start gap-4">
           {player.image ? (
             <img
@@ -181,9 +242,7 @@ const PlayerModal = ({ player, onClose }) => {
               {player.name}
             </p>
             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-              {player.teamFlag && (
-                <span className="text-xl">{player.teamFlag}</span>
-              )}
+              {player.teamFlag && <span className="text-xl">{player.teamFlag}</span>}
               {player.team && (
                 <span className="text-xs font-bold text-white/60 uppercase tracking-wide">{player.team}</span>
               )}
@@ -199,30 +258,45 @@ const PlayerModal = ({ player, onClose }) => {
           </div>
         </div>
 
-        {/* Divider */}
         <div className="h-px bg-white/10 mx-6" />
 
-        {/* Stats grid */}
-        <div className="p-6 space-y-4">
+        {/* Stats */}
+        <div className="p-6 space-y-5">
           {isBatter && (
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest text-icc-muted mb-3">Batting</p>
-              <div className="flex flex-wrap gap-2">
-                <StatPill label="Runs"   value={player.runs}   color="text-icc-gold" />
-                <StatPill label="Balls"  value={player.balls}  />
-                <StatPill label="SR"     value={player.strikeRate} color="text-yellow-300" />
-                <StatPill label="4s"     value={player.fours}  color="text-blue-300" />
-                <StatPill label="6s"     value={player.sixes}  color="text-red-300" />
+              <div className="flex flex-wrap gap-2 mb-4">
+                <StatPill label="Runs"   value={player.runs}        color="text-icc-gold" />
+                <StatPill label="Balls"  value={player.balls} />
+                <StatPill label="SR"     value={player.strikeRate}  color="text-yellow-300" />
+                <StatPill label="4s"     value={player.fours}       color="text-blue-300" />
+                <StatPill label="6s"     value={player.sixes}       color="text-red-300" />
               </div>
+              {/* vs. field comparison bars */}
+              {fieldStats.maxRuns > 0 && (
+                <div className="space-y-2 pt-3 border-t border-white/10">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-icc-muted mb-2">vs. Tournament Field</p>
+                  <CompareBar label="Runs"  playerVal={player.runs}       maxVal={fieldStats.maxRuns}   color="#FFD700" />
+                  {player.strikeRate != null && (
+                    <CompareBar label="SR"  playerVal={player.strikeRate} maxVal={fieldStats.maxSR}     color="#FBBF24" />
+                  )}
+                </div>
+              )}
             </div>
           )}
           {isBowler && (
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest text-icc-muted mb-3">Bowling</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mb-4">
                 <StatPill label="Wickets" value={player.wickets}  color="text-green-400" />
                 <StatPill label="Economy" value={player.economy}  color="text-emerald-300" />
               </div>
+              {fieldStats.maxWickets > 0 && (
+                <div className="space-y-2 pt-3 border-t border-white/10">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-icc-muted mb-2">vs. Tournament Field</p>
+                  <CompareBar label="Wickets" playerVal={player.wickets} maxVal={fieldStats.maxWickets} color="#4ADE80" />
+                </div>
+              )}
             </div>
           )}
           {player.matches != null && (
@@ -328,6 +402,13 @@ const AnalyticsSection = memo(({ batters = [], bowlers = [], players = [] }) => 
   const topBatter = filteredBatters.reduce((best, p) => (p.runs > (best?.runs ?? -1) ? p : best), null);
   const topBowler = filteredBowlers.reduce((best, p) => (p.wickets > (best?.wickets ?? -1) ? p : best), null);
 
+  /* ── Field stats for "vs. avg" comparison bars in modal ── */
+  const fieldStats = {
+    maxRuns:    runsData[0]?.value    ?? 1,
+    maxWickets: wicketsData[0]?.value ?? 1,
+    maxSR:      srData[0]?.value      ?? 1,
+  };
+
   /* ── Open modal: merge raw batter/bowler stats with enriched player meta ── */
   const openModal = useCallback((fullName, fallbackRole = 'Batsman') => {
     const enriched = playerByName[fullName];
@@ -362,7 +443,7 @@ const AnalyticsSection = memo(({ batters = [], bowlers = [], players = [] }) => 
       {/* ── Player Modal (rendered outside section flow via AnimatePresence) ── */}
       <AnimatePresence>
         {activePlayer && (
-          <PlayerModal player={activePlayer} onClose={() => setActivePlayer(null)} />
+          <PlayerModal player={activePlayer} onClose={() => setActivePlayer(null)} fieldStats={fieldStats} />
         )}
       </AnimatePresence>
 
@@ -422,7 +503,7 @@ const AnalyticsSection = memo(({ batters = [], bowlers = [], players = [] }) => 
             </div>
           </motion.div>
 
-          {/* ══ Insights strip (top 3 per category with rank badges) ══ */}
+          {/* ══ Insights strip — progress bar leaderboard ══ */}
           <AnimatePresence mode="wait">
             <motion.div
               key={selectedTeam}
@@ -435,77 +516,106 @@ const AnalyticsSection = memo(({ batters = [], bowlers = [], players = [] }) => 
                 ⭐ Key Insights
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Top 3 run scorers */}
-                <div className="glass-card rounded-2xl p-5">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-icc-muted mb-3">🏏 Top 3 Batsmen</p>
-                  <div className="space-y-2.5">
-                    {runsData.slice(0, 3).map((p, i) => (
+                {/* Top 3 run scorers with progress bars */}
+                <div className="glass-card rounded-2xl p-5 space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-icc-muted">🏏 Top Batsmen</p>
+                  {runsData.slice(0, 3).map((p, i) => {
+                    const pct = runsData[0]?.value > 0 ? (p.value / runsData[0].value) * 100 : 0;
+                    return (
                       <div
                         key={p.fullName}
-                        className="flex items-center gap-2.5 cursor-pointer group"
+                        className="cursor-pointer group space-y-1"
                         onClick={() => openModal(p.fullName, 'Batsman')}
                         title={`View ${p.fullName} stats`}
                       >
-                        <span className="text-base leading-none w-6 flex-shrink-0">
-                          {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
-                        </span>
-                        <span className="text-sm font-bold text-white group-hover:text-icc-gold transition-colors truncate flex-1">
-                          {p.fullName}
-                        </span>
-                        <span className="font-condensed font-black text-icc-gold text-base ml-auto flex-shrink-0">
-                          {p.value}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm leading-none w-5 flex-shrink-0">
+                            {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
+                          </span>
+                          <span className="text-xs font-bold text-white group-hover:text-icc-gold transition-colors truncate flex-1">
+                            {p.fullName}
+                          </span>
+                          <span className="font-condensed font-black text-icc-gold text-sm flex-shrink-0">{p.value}</span>
+                        </div>
+                        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full bg-icc-gold"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${pct}%` }}
+                            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 }}
+                          />
+                        </div>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
-                {/* Top 3 wicket takers */}
-                <div className="glass-card rounded-2xl p-5">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-icc-muted mb-3">⚡ Top 3 Bowlers</p>
-                  <div className="space-y-2.5">
-                    {wicketsData.slice(0, 3).map((p, i) => (
+
+                {/* Top 3 wicket takers with progress bars */}
+                <div className="glass-card rounded-2xl p-5 space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-icc-muted">⚡ Top Bowlers</p>
+                  {wicketsData.slice(0, 3).map((p, i) => {
+                    const pct = wicketsData[0]?.value > 0 ? (p.value / wicketsData[0].value) * 100 : 0;
+                    return (
                       <div
                         key={p.fullName}
-                        className="flex items-center gap-2.5 cursor-pointer group"
+                        className="cursor-pointer group space-y-1"
                         onClick={() => openModal(p.fullName, 'Bowler')}
                         title={`View ${p.fullName} stats`}
                       >
-                        <span className="text-base leading-none w-6 flex-shrink-0">
-                          {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
-                        </span>
-                        <span className="text-sm font-bold text-white group-hover:text-green-400 transition-colors truncate flex-1">
-                          {p.fullName}
-                        </span>
-                        <span className="font-condensed font-black text-green-400 text-base ml-auto flex-shrink-0">
-                          {p.value}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm leading-none w-5 flex-shrink-0">
+                            {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
+                          </span>
+                          <span className="text-xs font-bold text-white group-hover:text-green-400 transition-colors truncate flex-1">
+                            {p.fullName}
+                          </span>
+                          <span className="font-condensed font-black text-green-400 text-sm flex-shrink-0">{p.value}</span>
+                        </div>
+                        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full bg-green-400"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${pct}%` }}
+                            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 }}
+                          />
+                        </div>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
-                {/* Best SR */}
-                <div className="glass-card rounded-2xl p-5">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-icc-muted mb-3">💥 Best Strike Rates</p>
-                  <div className="space-y-2.5">
-                    {srData.slice(0, 3).map((p, i) => (
+
+                {/* Best SR with progress bars */}
+                <div className="glass-card rounded-2xl p-5 space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-icc-muted">💥 Best Strike Rates</p>
+                  {srData.slice(0, 3).map((p, i) => {
+                    const pct = srData[0]?.value > 0 ? (p.value / srData[0].value) * 100 : 0;
+                    return (
                       <div
                         key={p.fullName}
-                        className="flex items-center gap-2.5 cursor-pointer group"
+                        className="cursor-pointer group space-y-1"
                         onClick={() => openModal(p.fullName, 'Batsman')}
                         title={`View ${p.fullName} stats`}
                       >
-                        <span className="text-base leading-none w-6 flex-shrink-0">
-                          {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
-                        </span>
-                        <span className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors truncate flex-1">
-                          {p.fullName}
-                        </span>
-                        <span className="font-condensed font-black text-blue-400 text-base ml-auto flex-shrink-0">
-                          {p.value}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm leading-none w-5 flex-shrink-0">
+                            {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
+                          </span>
+                          <span className="text-xs font-bold text-white group-hover:text-blue-400 transition-colors truncate flex-1">
+                            {p.fullName}
+                          </span>
+                          <span className="font-condensed font-black text-blue-400 text-sm flex-shrink-0">{p.value}</span>
+                        </div>
+                        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full bg-blue-400"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${pct}%` }}
+                            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 }}
+                          />
+                        </div>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
               </div>
             </motion.div>
