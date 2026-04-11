@@ -382,7 +382,9 @@ const Dashboard = () => {
       </section>
 
       {/* ══════ STATS TICKER ══════ */}
-      <StatsTicker />
+      <ErrorBoundary fallbackMessage="Stats ticker failed to load.">
+        <StatsTicker />
+      </ErrorBoundary>
 
       {/* ══════ KPI STATS ══════ */}
       <section className="bg-icc-dark py-16 border-b border-icc-border/40"
@@ -401,12 +403,14 @@ const Dashboard = () => {
       </section>
 
       {/* ══════ MATCHES ══════ */}
-      <section className="bg-icc-dark border-b border-icc-border/40">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-16">
-          <SectionHeader eyebrow="Full Results" title="Tournament Matches" id="matches-heading" />
-        </div>
-        <MatchesGrid matches={matches || []} loading={mLoad} error={mErr} />
-      </section>
+      <ErrorBoundary fallbackMessage="Matches grid failed to load.">
+        <section className="bg-icc-dark border-b border-icc-border/40">
+          <div className="max-w-screen-xl mx-auto px-4 sm:px-6 pt-16">
+            <SectionHeader eyebrow="Full Results" title="Tournament Matches" id="matches-heading" />
+          </div>
+          <MatchesGrid matches={matches || []} loading={mLoad} error={mErr} />
+        </section>
+      </ErrorBoundary>
 
       {/* ══════ ANALYTICS (Recharts) ══════ */}
       <ErrorBoundary fallbackMessage="Analytics charts failed to load.">
@@ -431,7 +435,8 @@ const Dashboard = () => {
       </ErrorBoundary>
 
       {/* ══════ PLAYERS ══════ */}
-      <section id="players" aria-labelledby={filterTitleId}
+      <ErrorBoundary fallbackMessage="Players section failed to load.">
+        <section id="players" aria-labelledby={filterTitleId}
         className="bg-icc-dark py-16 border-b border-icc-border/40">
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
           <SectionHeader eyebrow="Top Performers" title="Players" id={filterTitleId} />
@@ -568,30 +573,35 @@ const Dashboard = () => {
           </AnimatePresence>
         </div>
       </section>
+      </ErrorBoundary>
 
       {/* ══════ TEAMS ══════ */}
-      <section id="teams" aria-labelledby="teams-heading"
-        className="bg-icc-navy/50 py-16 border-b border-icc-border/40">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
-          <SectionHeader eyebrow="2024 Tournament" title="Team Rankings" id="teams-heading" />
-          <div role="list" aria-label="Team cards"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {teamsForCards.map((t, i) => (
-              <motion.div key={t.team} role="listitem"
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: (i % 3) * 0.1 }}>
-                <TeamCard team={t.team} wins={t.wins} rank={t.rank}
-                  group={t.group} flag={t.flag} />
-              </motion.div>
-            ))}
+      <ErrorBoundary fallbackMessage="Team rankings failed to load.">
+        <section id="teams" aria-labelledby="teams-heading"
+          className="bg-icc-navy/50 py-16 border-b border-icc-border/40">
+          <div className="max-w-screen-xl mx-auto px-4 sm:px-6">
+            <SectionHeader eyebrow="2024 Tournament" title="Team Rankings" id="teams-heading" />
+            <div role="list" aria-label="Team cards"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {teamsForCards.map((t, i) => (
+                <motion.div key={t.team} role="listitem"
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.45, delay: (i % 3) * 0.1 }}>
+                  <TeamCard team={t.team} wins={t.wins} rank={t.rank}
+                    group={t.group} flag={t.flag} />
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </ErrorBoundary>
 
       {/* ══════ STATS LEADERBOARD ══════ */}
-      <StatsSection batters={appData.topBatters || []} bowlers={appData.topBowlers || []} loading={false} />
+      <ErrorBoundary fallbackMessage="Stats leaderboard failed to load.">
+        <StatsSection batters={appData.topBatters || []} bowlers={appData.topBowlers || []} loading={false} />
+      </ErrorBoundary>
 
       {/* ══════ FOOTER ══════ */}
       <footer role="contentinfo" className="border-t border-icc-border/40 bg-icc-dark py-8">
