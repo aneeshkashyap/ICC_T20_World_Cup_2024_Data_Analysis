@@ -34,7 +34,7 @@ const TEAM_FLAGS = {
   'New Zealand':              'https://flagcdn.com/w40/nz.png',
   'Sri Lanka':                'https://flagcdn.com/w40/lk.png',
   Ireland:                    'https://flagcdn.com/w40/ie.png',
-  Scotland:                   '/ICC_T20_World_Cup_2024_Data_Analysis/flag-scotland.png',
+  Scotland:                   'https://flagcdn.com/w80/gb-sct.png',
   Netherlands:                'https://flagcdn.com/w40/nl.png',
   Canada:                     'https://flagcdn.com/w40/ca.png',
   Uganda:                     'https://flagcdn.com/w40/ug.png',
