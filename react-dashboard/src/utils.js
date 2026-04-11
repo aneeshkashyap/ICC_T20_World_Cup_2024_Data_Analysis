@@ -3,7 +3,7 @@ export const teamFlags = {
   'South Africa':               'https://flagcdn.com/w40/za.png',
   'Australia':                  'https://flagcdn.com/w40/au.png',
   'England':                    'https://flagcdn.com/w40/gb-eng.png',
-  'West Indies':                '/ICC_T20_World_Cup_2024_Data_Analysis/flag-west-indies.svg',
+  'West Indies':                '/ICC_T20_World_Cup_2024_Data_Analysis/flag-west-indies.png',
   'Afghanistan':                'https://flagcdn.com/w40/af.png',
   'Bangladesh':                 'https://flagcdn.com/w40/bd.png',
   'Pakistan':                   'https://flagcdn.com/w40/pk.png',

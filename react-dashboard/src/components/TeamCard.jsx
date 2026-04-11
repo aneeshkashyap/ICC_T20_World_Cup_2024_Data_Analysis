@@ -78,7 +78,7 @@ const TeamCard = memo(({ team, wins, rank, group, flag }) => {
         <div className="w-24 h-16 rounded-xl overflow-hidden border border-white/15 shadow-xl">
           {!flagFailed && flag ? (
             <img src={flag} alt={`${team} flag`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
               loading="lazy" decoding="async"
               onError={() => setFlagFailed(true)}
               width={96} height={64} />
