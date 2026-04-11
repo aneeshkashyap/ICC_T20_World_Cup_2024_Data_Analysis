@@ -761,11 +761,7 @@ const Dashboard = () => {
         </motion.section>
       </ErrorBoundary>
       <ErrorBoundary fallbackMessage="Stats leaderboard failed to load.">
-        <StatsSection
-          batters={(appData.topBatters || []).map(b => ({ ...b, team: PLAYER_META[b.striker]?.team || b.team || '' }))}
-          bowlers={(appData.topBowlers || []).map(b => ({ ...b, team: PLAYER_META[b.bowler]?.team  || b.team || '' }))}
-          loading={false}
-        />
+        <StatsSection batters={appData.topBatters || []} bowlers={appData.topBowlers || []} loading={false} />
       </ErrorBoundary>
 
       {/* ══════ FOOTER ══════ */}
