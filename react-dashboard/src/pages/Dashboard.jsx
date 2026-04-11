@@ -10,6 +10,7 @@ import MatchesGrid      from '../components/MatchesGrid';
 import AnalyticsSection from '../components/AnalyticsSection';
 import AnimatedNumber   from '../components/AnimatedNumber';
 import FeaturedMatchCard from '../components/FeaturedMatchCard';
+import MatchModal        from '../components/MatchModal';
 import StatsTicker      from '../components/StatsTicker';
 import { SectionError } from '../components/Skeletons';
 import ComparePlayers   from '../components/ComparePlayers';
@@ -180,6 +181,7 @@ const Dashboard = () => {
   const [selectedRole, setSelectedRole] = useState('All');
   const [rawSearch,    setRawSearch]    = useState('');
   const [view,         setView]         = useState('grid'); // 'grid' | 'table' | 'teams'
+  const [heroMatch,    setHeroMatch]    = useState(null);
 
   const search = useDebounce(rawSearch, 250);
 
@@ -366,7 +368,7 @@ const Dashboard = () => {
               {matches && matches.length > 0 && (
                 <FeaturedMatchCard
                   match={matches.find(m => m.match_type === 'Final') || matches[0]}
-                  onClick={m => { /* scroll to matches and open modal */ }}
+                  onClick={m => setHeroMatch(m)}
                 />
               )}
             </div>
@@ -601,6 +603,9 @@ const Dashboard = () => {
           </p>
         </div>
       </footer>
+
+      {/* Scorecard modal for Featured Match (hero section) */}
+      {heroMatch && <MatchModal match={heroMatch} onClose={() => setHeroMatch(null)} />}
     </motion.div>
   );
 };
