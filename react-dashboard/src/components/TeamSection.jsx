@@ -1,11 +1,27 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import PlayerCard from './PlayerCard';
+
+const containerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07 } },
+};
+const itemVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.97 },
+  show:   { opacity: 1, y: 0,  scale: 1, transition: { duration: 0.38, ease: [0.16, 1, 0.3, 1] } },
+};
 
 const TeamSection = ({ teamName, teamFlag, players = [] }) => {
   if (!players.length) return null;
 
   return (
-    <div className="mb-10">
+    <motion.div
+      className="mb-10"
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.45, ease: 'easeOut' }}
+    >
       {/* Team header */}
       <div className="flex items-center justify-between gap-4 pb-3 mb-4 border-b border-icc-border">
         <div className="flex items-center gap-3">
@@ -29,13 +45,21 @@ const TeamSection = ({ teamName, teamFlag, players = [] }) => {
         <span className="badge badge-blue">{players.length}</span>
       </div>
 
-      {/* Player grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+      {/* Player grid — staggered entrance */}
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: '-40px' }}
+      >
         {players.map((player, idx) => (
-          <PlayerCard key={player.id || idx} player={player} />
+          <motion.div key={player.id || idx} variants={itemVariants}>
+            <PlayerCard player={player} />
+          </motion.div>
         ))}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
