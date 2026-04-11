@@ -7,6 +7,30 @@ import {
   Cell, LabelList, RadarChart, PolarAngleAxis, PolarGrid, Radar,
 } from 'recharts';
 
+/* ── Emoji flags per team — no CDN dependency in the modal ── */
+const TEAM_EMOJI = {
+  'India':                      '🇮🇳',
+  'Australia':                  '🇦🇺',
+  'England':                    '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+  'Pakistan':                   '🇵🇰',
+  'South Africa':               '🇿🇦',
+  'West Indies':                '🏝️',
+  'Afghanistan':                '🇦🇫',
+  'Bangladesh':                 '🇧🇩',
+  'New Zealand':                '🇳🇿',
+  'Sri Lanka':                  '🇱🇰',
+  'Ireland':                    '🇮🇪',
+  'Scotland':                   '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  'Netherlands':                '🇳🇱',
+  'Canada':                     '🇨🇦',
+  'Uganda':                     '🇺🇬',
+  'Namibia':                    '🇳🇦',
+  'Oman':                       '🇴🇲',
+  'Nepal':                      '🇳🇵',
+  'Papua New Guinea':           '🇵🇬',
+  'United States of America':   '🇺🇸',
+};
+
 /* ── Animated count-up number ── */
 const AnimatedValue = ({ value, duration = 0.8 }) => {
   const motionVal = useMotionValue(0);
@@ -287,18 +311,8 @@ const PlayerModal = ({ player, onClose, fieldStats = {} }) => {
         </button>
 
         {/* Header */}
-        <div className="p-6 pb-4 flex items-start gap-4 relative">
-          {/* Blurred flag backdrop for premium feel */}
-          {player.teamFlag && typeof player.teamFlag === 'string' && player.teamFlag.startsWith('http') && (
-            <img
-              src={player.teamFlag}
-              aria-hidden="true"
-              alt=""
-              className="absolute -right-1 -top-1 w-32 h-24 object-cover select-none pointer-events-none rounded-xl"
-              style={{ opacity: 0.10, filter: 'blur(6px)' }}
-              onError={e => { e.currentTarget.style.display = 'none'; }}
-            />
-          )}
+        <div className="p-6 pb-4 flex items-start gap-4">
+          {/* Player avatar */}
           {player.image ? (
             <img
               src={player.image} alt={player.name}
@@ -311,26 +325,32 @@ const PlayerModal = ({ player, onClose, fieldStats = {} }) => {
               {player.role === 'Bowler' ? '⚡' : '🏏'}
             </div>
           )}
-          <div className="min-w-0">
-            <p className="font-condensed font-black text-2xl sm:text-3xl text-white leading-tight">
+
+          {/* Name + country row + role badge */}
+          <div className="min-w-0 flex-1">
+            <p className="font-condensed font-black text-2xl sm:text-3xl text-white leading-tight truncate pr-8">
               {player.name}
             </p>
-            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-              {player.teamFlag && (
-                typeof player.teamFlag === 'string' && player.teamFlag.startsWith('http')
-                  ? <img src={player.teamFlag} alt={player.team || 'flag'}
-                      className="w-6 h-4 object-cover rounded-sm border border-white/20 flex-shrink-0"
-                      onError={e => { e.currentTarget.style.display = 'none'; }} />
-                  : <span className="text-xl">{player.teamFlag}</span>
-              )}
+
+            <div className="flex items-center gap-3 mt-2 flex-wrap">
+              {/* Emoji flag + country name */}
               {player.team && (
-                <span className="text-xs font-bold text-white/60 uppercase tracking-wide">{player.team}</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-lg leading-none" aria-hidden="true">
+                    {TEAM_EMOJI[player.team] || '🏳️'}
+                  </span>
+                  <span className="text-xs font-bold text-white/70 uppercase tracking-widest">
+                    {player.team}
+                  </span>
+                </div>
               )}
+
+              {/* Role badge */}
               {player.role && (
-                <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border
-                  ${player.role === 'Batsman' ? 'border-yellow-500/40 text-yellow-400'
-                    : player.role === 'Bowler' ? 'border-green-500/40 text-green-400'
-                    : 'border-purple-500/40 text-purple-400'}`}>
+                <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border
+                  ${player.role === 'Batsman'     ? 'border-yellow-500/40 bg-yellow-500/10 text-yellow-400'
+                    : player.role === 'Bowler'    ? 'border-green-500/40 bg-green-500/10 text-green-400'
+                    : 'border-purple-500/40 bg-purple-500/10 text-purple-400'}`}>
                   {player.role}
                 </span>
               )}
