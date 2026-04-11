@@ -4,7 +4,7 @@ import React, { memo, useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  Cell, LabelList,
+  Cell, LabelList, RadarChart, PolarAngleAxis, PolarGrid, Radar,
 } from 'recharts';
 
 /* ── Animated count-up number ── */
@@ -144,6 +144,69 @@ const AnimCard = ({ children, delay = 0, className = '' }) => (
   </motion.div>
 );
 
+/* ── Achievement badge computation ── */
+const getBadges = (player, fieldStats = {}) => {
+  const badges = [];
+  const runs    = parseFloat(player.runs);
+  const sr      = parseFloat(player.strikeRate);
+  const wickets = parseFloat(player.wickets);
+  const economy = parseFloat(player.economy);
+  const sixes   = parseFloat(player.sixes);
+  const fours   = parseFloat(player.fours);
+  if (!isNaN(runs)    && (fieldStats.maxRuns ?? 0) > 0 && runs >= fieldStats.maxRuns * 0.88)
+    badges.push({ label: 'Run Machine',    icon: '🔥', cls: 'text-yellow-400 border-yellow-400/40 bg-yellow-400/10'  });
+  if (!isNaN(sr)      && sr >= 162)
+    badges.push({ label: 'Power Hitter',   icon: '💥', cls: 'text-orange-400 border-orange-400/40 bg-orange-400/10' });
+  if (!isNaN(sixes)   && sixes >= 8)
+    badges.push({ label: 'Sixer King',     icon: '🚀', cls: 'text-red-400 border-red-400/40 bg-red-400/10'          });
+  if (!isNaN(fours)   && fours >= 14)
+    badges.push({ label: 'Boundary King',  icon: '🏏', cls: 'text-sky-400 border-sky-400/40 bg-sky-400/10'          });
+  if (!isNaN(wickets) && (fieldStats.maxWickets ?? 0) > 0 && wickets >= fieldStats.maxWickets * 0.80)
+    badges.push({ label: 'Wicket Maestro', icon: '⚡', cls: 'text-green-400 border-green-400/40 bg-green-400/10'    });
+  if (!isNaN(economy) && economy > 0 && economy <= 6.5)
+    badges.push({ label: 'Economy Ace',    icon: '🎯', cls: 'text-purple-400 border-purple-400/40 bg-purple-400/10' });
+  return badges;
+};
+
+/* ── Spider / radar chart for player profile in modal ── */
+const PlayerRadarChart = ({ player, fieldStats }) => {
+  const isBatter = player.role === 'Batsman'     || player.role === 'All-rounder';
+  const isBowler = player.role === 'Bowler'      || player.role === 'All-rounder';
+  const N = (val, max) => (max > 0 ? Math.max(0, Math.min(100, Math.round((parseFloat(val) || 0) / max * 100))) : 0);
+  const data = [
+    ...(isBatter ? [
+      { subject: 'Runs', A: N(player.runs,        fieldStats.maxRuns    ?? 1) },
+      { subject: 'SR',   A: N(player.strikeRate,   fieldStats.maxSR      ?? 1) },
+      { subject: '4s',   A: N(player.fours,        fieldStats.maxFours   ?? 1) },
+      { subject: '6s',   A: N(player.sixes,        fieldStats.maxSixes   ?? 1) },
+    ] : []),
+    ...(isBowler ? [
+      { subject: 'Wkts', A: N(player.wickets, fieldStats.maxWickets ?? 1) },
+      { subject: 'Econ', A: (fieldStats.maxEconomy ?? 0) > 0
+          ? Math.max(0, Math.round((1 - (parseFloat(player.economy) || fieldStats.maxEconomy) / fieldStats.maxEconomy) * 100))
+          : 0 },
+    ] : []),
+  ];
+  if (data.length < 3) return null;
+  const color = player.role === 'Bowler' ? '#4ADE80' : '#FFD700';
+  return (
+    <div className="pt-3 border-t border-white/10">
+      <p className="text-[9px] font-black uppercase tracking-widest text-icc-muted mb-1">Player Profile</p>
+      <ResponsiveContainer width="100%" height={155}>
+        <RadarChart data={data} margin={{ top: 10, right: 30, bottom: 6, left: 30 }}>
+          <PolarGrid stroke="rgba(255,255,255,0.08)" />
+          <PolarAngleAxis dataKey="subject" tick={{ fill: '#8B9CC8', fontSize: 10, fontWeight: 700 }} />
+          <Radar
+            name={player.name} dataKey="A"
+            stroke={color} fill={color} fillOpacity={0.18}
+            isAnimationActive animationDuration={850} animationEasing="ease-out"
+          />
+        </RadarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+
 /* ── Player Detail Modal ── */
 const ROLE_GRADIENT = {
   Batsman:     'from-yellow-900/80 to-icc-dark',
@@ -206,7 +269,7 @@ const PlayerModal = ({ player, onClose, fieldStats = {} }) => {
       aria-label={`${player.name} stats`}
     >
       <motion.div
-        className={`relative w-full max-w-lg rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-gradient-to-br ${grad}`}
+        className={`relative w-full max-w-xl rounded-3xl overflow-y-auto border border-white/10 shadow-2xl bg-gradient-to-br ${grad} max-h-[90vh]`}
         initial={{ opacity: 0, scale: 0.88, y: 32 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 24 }}
@@ -224,7 +287,17 @@ const PlayerModal = ({ player, onClose, fieldStats = {} }) => {
         </button>
 
         {/* Header */}
-        <div className="p-6 pb-4 flex items-start gap-4">
+        <div className="p-6 pb-4 flex items-start gap-4 relative">
+          {/* Blurred flag backdrop for premium feel */}
+          {player.teamFlag && (
+            <span
+              aria-hidden="true"
+              className="absolute -right-1 -top-1 text-[88px] leading-none select-none pointer-events-none"
+              style={{ opacity: 0.07, filter: 'blur(4px)' }}
+            >
+              {player.teamFlag}
+            </span>
+          )}
           {player.image ? (
             <img
               src={player.image} alt={player.name}
@@ -259,6 +332,27 @@ const PlayerModal = ({ player, onClose, fieldStats = {} }) => {
         </div>
 
         <div className="h-px bg-white/10 mx-6" />
+
+        {/* Achievement Badges */}
+        {(() => {
+          const badges = getBadges(player, fieldStats);
+          if (!badges.length) return null;
+          return (
+            <div className="px-6 pt-4 flex flex-wrap gap-2">
+              {badges.map(b => (
+                <motion.span
+                  key={b.label}
+                  initial={{ opacity: 0, scale: 0.75 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border ${b.cls} inline-flex items-center gap-1.5`}
+                >
+                  {b.icon} {b.label}
+                </motion.span>
+              ))}
+            </div>
+          );
+        })()}
 
         {/* Stats */}
         <div className="p-6 space-y-5">
@@ -304,6 +398,7 @@ const PlayerModal = ({ player, onClose, fieldStats = {} }) => {
               {player.matches} innings in this tournament
             </p>
           )}
+          <PlayerRadarChart player={player} fieldStats={fieldStats} />
         </div>
       </motion.div>
     </motion.div>
@@ -342,7 +437,7 @@ const PerformerCard = ({ label, name, value, unit, sub, icon, gradientFrom, grad
       </p>
       <div className="flex items-baseline gap-2 mt-1">
         <span className="font-condensed font-black text-4xl sm:text-5xl text-white">
-          {value != null ? Number(value).toLocaleString() : '—'}
+          {value != null ? <AnimatedValue value={Number(value)} /> : '—'}
         </span>
         <span className="text-sm font-bold text-white/60 uppercase tracking-wide">{unit}</span>
       </div>
@@ -403,10 +498,16 @@ const AnalyticsSection = memo(({ batters = [], bowlers = [], players = [] }) => 
   const topBowler = filteredBowlers.reduce((best, p) => (p.wickets > (best?.wickets ?? -1) ? p : best), null);
 
   /* ── Field stats for "vs. avg" comparison bars in modal ── */
+  const maxFours   = filteredBatters.reduce((m, b) => Math.max(m, b.fours   ?? 0), 0) || 1;
+  const maxSixes   = filteredBatters.reduce((m, b) => Math.max(m, b.sixes   ?? 0), 0) || 1;
+  const maxEconomy = filteredBowlers.reduce((m, b) => Math.max(m, parseFloat(b.economy) || 0), 0) || 12;
   const fieldStats = {
     maxRuns:    runsData[0]?.value    ?? 1,
     maxWickets: wicketsData[0]?.value ?? 1,
     maxSR:      srData[0]?.value      ?? 1,
+    maxFours,
+    maxSixes,
+    maxEconomy,
   };
 
   /* ── Open modal: merge raw batter/bowler stats with enriched player meta ── */
