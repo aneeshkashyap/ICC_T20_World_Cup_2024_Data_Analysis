@@ -233,11 +233,16 @@ const Dashboard = () => {
     const raw = appData.teamWins || [];
     const india       = raw.find(t => t.team === 'India');
     const southAfrica = raw.find(t => t.team === 'South Africa');
-    const rest        = raw.filter(t => t.team !== 'India' && t.team !== 'South Africa');
+    const afghanistan = raw.find(t => t.team === 'Afghanistan');
+    const england     = raw.find(t => t.team === 'England');
+    const SEMI_FINALIST_TEAMS = new Set(['India', 'South Africa', 'Afghanistan', 'England']);
+    const rest = raw.filter(t => !SEMI_FINALIST_TEAMS.has(t.team));
     return [
       india       && { ...india,       rank: 1 },
       southAfrica && { ...southAfrica, rank: 2 },
-      ...rest.map((t, idx) => ({ ...t, rank: idx + 3 })),
+      afghanistan && { ...afghanistan, rank: 3 },
+      england     && { ...england,     rank: 3 },
+      ...rest.map((t, idx) => ({ ...t, rank: idx + 5 })),
     ].filter(Boolean).map(t => ({
       team: t.team, wins: t.wins, rank: t.rank,
       flag: TEAM_FLAGS[t.team] || getFlag(t.team),
