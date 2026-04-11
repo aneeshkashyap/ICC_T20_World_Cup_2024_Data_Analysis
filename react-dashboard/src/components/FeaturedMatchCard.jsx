@@ -73,10 +73,14 @@ const FeaturedMatchCard = memo(({ match, onClick }) => {
 
         {/* VS */}
         <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center
-                          bg-white/[0.05] border border-white/10">
-            <span className="font-condensed font-black text-xs tracking-widest text-white/30">VS</span>
-          </div>
+          <motion.div
+            className="w-10 h-10 rounded-full flex items-center justify-center
+                        bg-white/[0.05] border border-white/15 relative"
+            animate={{ boxShadow: ['0 0 0px rgba(255,215,0,0)', '0 0 16px rgba(255,215,0,0.35)', '0 0 0px rgba(255,215,0,0)'] }}
+            transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <span className="font-condensed font-black text-xs tracking-widest text-white/40">VS</span>
+          </motion.div>
         </div>
 
         {/* Team 2 */}

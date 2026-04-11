@@ -1,5 +1,5 @@
 import React, { memo, useState, useCallback, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { getFlag } from '../utils';
 
 /* ─── Role config ─── */
@@ -80,6 +80,25 @@ const PlayerCard = memo(({ player, index = 0, maxRuns = 300, maxWickets = 20 }) 
   const onAErr = useCallback(() => setAvatarErr(true), []);
   const onFErr = useCallback(() => setFlagErr(true),   []);
 
+  /* ── 3D tilt ── */
+  const cardRef    = useRef(null);
+  const motionX    = useMotionValue(0);
+  const motionY    = useMotionValue(0);
+  const rotateX    = useSpring(useTransform(motionY, [-0.5, 0.5], [8, -8]),  { stiffness: 300, damping: 30 });
+  const rotateY    = useSpring(useTransform(motionX, [-0.5, 0.5], [-8, 8]), { stiffness: 300, damping: 30 });
+
+  const handleMouseMove = useCallback((e) => {
+    const rect = cardRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    motionX.set((e.clientX - rect.left) / rect.width - 0.5);
+    motionY.set((e.clientY - rect.top)  / rect.height - 0.5);
+  }, [motionX, motionY]);
+
+  const handleMouseLeave = useCallback(() => {
+    motionX.set(0);
+    motionY.set(0);
+  }, [motionX, motionY]);
+
   const initials   = name.split(' ').map(w => w[0]).slice(0, 2).join('');
   const avatarSrc  = (!image || avatarErr)
     ? null
@@ -91,12 +110,16 @@ const PlayerCard = memo(({ player, index = 0, maxRuns = 300, maxWickets = 20 }) 
 
   return (
     <motion.article
+      ref={cardRef}
       layout
       initial={{ opacity: 0, y: 28, scale: 0.96 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.5, delay: (index % 6) * 0.07, ease: [0.16, 1, 0.3, 1] }}
       whileHover={{ y: -6, scale: 1.02 }}
+      style={{ rotateX, rotateY, transformPerspective: 900, transformStyle: 'preserve-3d' }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       className="player-card rounded-2xl overflow-hidden flex flex-col group cursor-default relative"
       aria-label={`${name}, ${team}, ${role}`}
     >

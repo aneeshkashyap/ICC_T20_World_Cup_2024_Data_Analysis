@@ -79,14 +79,20 @@ const MatchCard = memo(({ match, onClick, index = 0 }) => {
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.45, delay: (index % 6) * 0.06, ease: 'easeOut' }}
-      whileHover={{ y: -6, scale: 1.02 }}
+      whileHover={{ y: -6, scale: 1.02, boxShadow: '0 20px 48px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,215,0,0.22), 0 0 24px rgba(255,215,0,0.10)' }}
       whileTap={{ scale: 0.98 }}
       onClick={handleClick}
       className="bg-[#122B5A] w-full text-center rounded-xl shadow-md overflow-hidden flex flex-col items-center group focus:outline-none focus:ring-2 focus:ring-icc-gold/50 cursor-pointer"
       aria-label={`Match: ${team1} vs ${team2}`}
     >
-      {/* Shimmer top border */}
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-icc-gold/50 to-transparent" />
+      {/* Shimmer top border — brightens on hover */}
+      <motion.div
+        className="h-px w-full bg-gradient-to-r from-transparent via-icc-gold/50 to-transparent"
+        whileHover={{ opacity: 1 }}
+        initial={{ opacity: 0.5 }}
+        animate={{ opacity: [0.4, 0.85, 0.4] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: (index % 6) * 0.4 }}
+      />
 
       <div className="p-4 flex flex-col items-center gap-3 w-full">
 

@@ -32,13 +32,23 @@ export default {
         'glass':      '0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
       },
       animation: {
-        'pulse-slow': 'pulse 3s ease-in-out infinite',
-        'float':      'float 6s ease-in-out infinite',
-        'shimmer':    'shimmer 1.8s linear infinite',
+        'pulse-slow':  'pulse 3s ease-in-out infinite',
+        'float':       'float 6s ease-in-out infinite',
+        'shimmer':     'shimmer 1.8s linear infinite',
+        'glow-pulse':  'glowPulse 2.2s ease-in-out infinite',
+        'border-glow': 'borderGlow 2.5s ease-in-out infinite',
       },
       keyframes: {
-        float:   { '0%,100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-8px)' } },
-        shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
+        float:      { '0%,100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-8px)' } },
+        shimmer:    { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
+        glowPulse:  {
+          '0%,100%': { boxShadow: '0 0 10px rgba(255,215,0,0.15), 0 0 20px rgba(255,215,0,0.08)' },
+          '50%':     { boxShadow: '0 0 28px rgba(255,215,0,0.45), 0 0 56px rgba(255,215,0,0.20)' },
+        },
+        borderGlow: {
+          '0%,100%': { borderColor: 'rgba(255,215,0,0.25)' },
+          '50%':     { borderColor: 'rgba(255,215,0,0.65)' },
+        },
       },
     },
   },

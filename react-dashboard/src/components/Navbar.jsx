@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 
 const NAV_LINKS = [
   { label: 'Home',      href: '#hero',      icon: '🏠' },
@@ -16,6 +16,9 @@ const Navbar = () => {
   const [open,       setOpen]       = useState(false);
   const [scrolled,   setScrolled]   = useState(false);
   const [activeLink, setActiveLink] = useState('#hero');
+
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 400, damping: 40, restDelta: 0.001 });
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -133,6 +136,12 @@ const Navbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ── Scroll progress bar ── */}
+      <motion.div
+        className="absolute bottom-0 left-0 right-0 h-[2px] bg-icc-gold origin-left pointer-events-none"
+        style={{ scaleX }}
+      />
     </motion.nav>
   );
 };

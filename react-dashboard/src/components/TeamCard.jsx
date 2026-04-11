@@ -1,5 +1,5 @@
-import React, { memo, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { memo, useState, useRef, useCallback } from 'react';
+import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import AnimatedNumber from './AnimatedNumber';
 
 const RANK_CONFIG = {
@@ -16,25 +16,54 @@ const TeamCard = memo(({ team, wins, rank, group, flag }) => {
     glow: 'transparent', text: 'text-white', pill: 'pill-group',
   };
 
+  /* ── 3D tilt ── */
+  const cardRef  = useRef(null);
+  const motionX  = useMotionValue(0);
+  const motionY  = useMotionValue(0);
+  const rotateX  = useSpring(useTransform(motionY, [-0.5, 0.5], [7, -7]),  { stiffness: 280, damping: 28 });
+  const rotateY  = useSpring(useTransform(motionX, [-0.5, 0.5], [-7, 7]), { stiffness: 280, damping: 28 });
+
+  const handleMouseMove  = useCallback((e) => {
+    const rect = cardRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    motionX.set((e.clientX - rect.left) / rect.width  - 0.5);
+    motionY.set((e.clientY - rect.top)  / rect.height - 0.5);
+  }, [motionX, motionY]);
+
+  const handleMouseLeave = useCallback(() => { motionX.set(0); motionY.set(0); }, [motionX, motionY]);
+
   const shortName = team
     .replace('United States of America', 'USA')
     .replace('Papua New Guinea', 'PNG');
 
   return (
     <motion.article
+      ref={cardRef}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.45, ease: 'easeOut' }}
       whileHover={{ y: -5, scale: 1.015 }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       className="team-card rounded-2xl p-6 flex flex-col items-center gap-4 relative overflow-hidden cursor-default"
-      style={{ border: `1px solid ${cfg.border}`, boxShadow: `0 8px 32px ${cfg.glow}` }}
+      style={{ border: `1px solid ${cfg.border}`, boxShadow: `0 8px 32px ${cfg.glow}`, rotateX, rotateY, transformPerspective: 900, transformStyle: 'preserve-3d' }}
       aria-label={`${team} — ${wins} wins, Rank ${rank}`}
     >
       {/* Background glow for top ranked */}
       {rank <= 2 && (
         <div className="absolute inset-0 pointer-events-none"
           style={{ background: `radial-gradient(ellipse at 50% 0%, ${cfg.glow} 0%, transparent 65%)` }} />
+      )}
+
+      {/* Champion border glow ring */}
+      {rank === 1 && (
+        <motion.div
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          animate={{ opacity: [0.3, 0.8, 0.3] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ boxShadow: 'inset 0 0 24px rgba(255,215,0,0.14), 0 0 32px rgba(255,215,0,0.12)' }}
+        />
       )}
 
       {/* Top-left rank badge */}
@@ -66,7 +95,7 @@ const TeamCard = memo(({ team, wins, rank, group, flag }) => {
 
       {/* Team name */}
       <div className="text-center flex flex-col gap-1">
-        <h3 className={`font-condensed font-black text-2xl uppercase tracking-wide leading-none ${cfg.text}`}>
+        <h3 className={`font-condensed font-black text-2xl uppercase tracking-wide leading-none ${cfg.text}${rank === 1 ? ' text-gold-glow' : ''}`}>
           {shortName}
         </h3>
         <p className="text-[9px] tracking-[0.2em] text-white/25 uppercase">ICC T20 World Cup 2024</p>
