@@ -554,6 +554,7 @@ const Dashboard = () => {
           <AnalyticsSection
             batters={appData.topBatters || []}
             bowlers={appData.topBowlers || []}
+            players={players || []}
           />
         </motion.div>
       </ErrorBoundary>
