@@ -289,14 +289,15 @@ const PlayerModal = ({ player, onClose, fieldStats = {} }) => {
         {/* Header */}
         <div className="p-6 pb-4 flex items-start gap-4 relative">
           {/* Blurred flag backdrop for premium feel */}
-          {player.teamFlag && (
-            <span
+          {player.teamFlag && typeof player.teamFlag === 'string' && player.teamFlag.startsWith('http') && (
+            <img
+              src={player.teamFlag}
               aria-hidden="true"
-              className="absolute -right-1 -top-1 text-[88px] leading-none select-none pointer-events-none"
-              style={{ opacity: 0.07, filter: 'blur(4px)' }}
-            >
-              {player.teamFlag}
-            </span>
+              alt=""
+              className="absolute -right-1 -top-1 w-32 h-24 object-cover select-none pointer-events-none rounded-xl"
+              style={{ opacity: 0.10, filter: 'blur(6px)' }}
+              onError={e => { e.currentTarget.style.display = 'none'; }}
+            />
           )}
           {player.image ? (
             <img
@@ -315,7 +316,13 @@ const PlayerModal = ({ player, onClose, fieldStats = {} }) => {
               {player.name}
             </p>
             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-              {player.teamFlag && <span className="text-xl">{player.teamFlag}</span>}
+              {player.teamFlag && (
+                typeof player.teamFlag === 'string' && player.teamFlag.startsWith('http')
+                  ? <img src={player.teamFlag} alt={player.team || 'flag'}
+                      className="w-6 h-4 object-cover rounded-sm border border-white/20 flex-shrink-0"
+                      onError={e => { e.currentTarget.style.display = 'none'; }} />
+                  : <span className="text-xl">{player.teamFlag}</span>
+              )}
               {player.team && (
                 <span className="text-xs font-bold text-white/60 uppercase tracking-wide">{player.team}</span>
               )}
