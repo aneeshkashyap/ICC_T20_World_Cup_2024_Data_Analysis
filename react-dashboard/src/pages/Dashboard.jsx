@@ -159,6 +159,15 @@ const buildPlayers = () => {
     });
   });
 
+  // Enrich all-rounders: fill missing runs/wickets from scorecard meta
+  for (const [name, p] of players) {
+    if (p.role === 'All-rounder') {
+      const meta = PLAYER_META[name] || {};
+      if (p.runs == null && meta.battingRuns)   p.runs = meta.battingRuns;
+      if (p.wickets == null && meta.bowlingWickets) p.wickets = meta.bowlingWickets;
+    }
+  }
+
   return Array.from(players.values());
 };
 
