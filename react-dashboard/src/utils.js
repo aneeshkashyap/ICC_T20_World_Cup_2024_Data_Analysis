@@ -3,7 +3,7 @@ export const teamFlags = {
   'South Africa': 'https://flagcdn.com/w40/za.png',
   'Australia': 'https://flagcdn.com/w40/au.png',
   'England': 'https://flagcdn.com/w40/gb-eng.png',
-  'West Indies': 'https://flagcdn.com/w40/jm.png',
+  'West Indies': 'https://upload.wikimedia.org/wikipedia/en/thumb/9/9b/WestIndiesCricket_flag.svg/300px-WestIndiesCricket_flag.svg.png',
   'Afghanistan': 'https://flagcdn.com/w40/af.png',
   'Bangladesh': 'https://flagcdn.com/w40/bd.png',
   'Pakistan': 'https://flagcdn.com/w40/pk.png',
@@ -23,7 +23,7 @@ export const teamFlags = {
 
 const teamFlagCodes = {
   'India': 'in', 'South Africa': 'za', 'Australia': 'au', 'England': 'gb-eng',
-  'West Indies': 'jm', 'Afghanistan': 'af', 'Bangladesh': 'bd', 'Pakistan': 'pk',
+  'West Indies': 'wi', 'Afghanistan': 'af', 'Bangladesh': 'bd', 'Pakistan': 'pk',
   'New Zealand': 'nz', 'Sri Lanka': 'lk', 'Ireland': 'ie', 'Scotland': 'gb-sct',
   'Netherlands': 'nl', 'Canada': 'ca', 'Uganda': 'ug', 'Namibia': 'na',
   'Oman': 'om', 'Nepal': 'np', 'Papua New Guinea': 'pg',

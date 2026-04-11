@@ -14,7 +14,7 @@ const TEAM_EMOJI = {
   'England':                    '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
   'Pakistan':                   '🇵🇰',
   'South Africa':               '🇿🇦',
-  'West Indies':                '🏝️',
+  'West Indies':                '�',
   'Afghanistan':                '🇦🇫',
   'Bangladesh':                 '🇧🇩',
   'New Zealand':                '🇳🇿',

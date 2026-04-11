@@ -28,7 +28,7 @@ const TEAM_FLAGS = {
   England:                  'https://flagcdn.com/w40/gb-eng.png',
   Pakistan:                 'https://flagcdn.com/w40/pk.png',
   'South Africa':           'https://flagcdn.com/w40/za.png',
-  'West Indies':            'https://flagcdn.com/w40/jm.png',
+  'West Indies':            'https://upload.wikimedia.org/wikipedia/en/thumb/9/9b/WestIndiesCricket_flag.svg/300px-WestIndiesCricket_flag.svg.png',
   Afghanistan:              'https://flagcdn.com/w40/af.png',
   Bangladesh:               'https://flagcdn.com/w40/bd.png',
   'New Zealand':            'https://flagcdn.com/w40/nz.png',
