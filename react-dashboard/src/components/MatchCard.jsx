@@ -20,8 +20,8 @@ const FlagImg = ({ team, className }) => {
 
 const TYPE_PILL   = { Final: 'pill-final', 'Semi Final': 'pill-semi' };
 const short       = t => t.replace('United States of America', 'USA').replace('Papua New Guinea', 'PNG');
-// overs in scorecards.json are stored as strings — parse first, then round to 1dp
-const fmtOvers    = o => { const n = parseFloat(o); return isNaN(n) ? '—' : (Number.isInteger(n) ? n : parseFloat(n.toFixed(1))); };
+// overs in scorecards.json are stored as strings — parse, cap at 20, format to 1dp
+const fmtOvers    = o => { const n = parseFloat(o); return isNaN(n) ? '—' : Math.min(n, 20).toFixed(1); };
 
 /* Compute balls remaining when chasing team wins by wickets */
 const ballsLeft = (overs) => {
