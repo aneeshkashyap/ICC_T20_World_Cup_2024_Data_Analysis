@@ -132,7 +132,7 @@ const MatchModal = ({ match, onClose }) => {
     umpire1, umpire2, reserve_umpire, match_referee, match_type
   } = match;
 
-  const matchNumber  = parseInt(match_num.replace('Match ', ''));
+  const matchNumber  = match_num.replace('Match ', '').trim();
   const inningsList  = scorecards[matchNumber] || [];
   const currentInning = inningsList[activeInning] || null;
   const team1Won  = winner === team1;

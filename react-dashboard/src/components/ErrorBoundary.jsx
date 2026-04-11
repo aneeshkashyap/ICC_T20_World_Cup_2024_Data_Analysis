@@ -29,6 +29,14 @@ export class ErrorBoundary extends Component {
             <p className="text-xs text-icc-muted mt-1">
               {this.props.fallbackMessage || 'This section failed to load. Please refresh the page.'}
             </p>
+            {this.state.error && (
+              <details className="mt-3 text-left max-w-sm">
+                <summary className="text-[10px] text-icc-muted cursor-pointer hover:text-white">Show error details</summary>
+                <pre className="mt-1 text-[10px] text-red-400 whitespace-pre-wrap break-all">
+                  {this.state.error.message}
+                </pre>
+              </details>
+            )}
           </div>
           <button
             className="btn-outline-gold text-xs px-4 py-2"

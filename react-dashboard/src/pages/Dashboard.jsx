@@ -13,6 +13,7 @@ import FeaturedMatchCard from '../components/FeaturedMatchCard';
 import MatchModal        from '../components/MatchModal';
 import StatsTicker      from '../components/StatsTicker';
 import { SectionError } from '../components/Skeletons';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 import ComparePlayers   from '../components/ComparePlayers';
 import MatchPredictor   from '../components/MatchPredictor';
 import { useDeferredData, useDebounce } from '../hooks';
@@ -408,20 +409,26 @@ const Dashboard = () => {
       </section>
 
       {/* ══════ ANALYTICS (Recharts) ══════ */}
-      <AnalyticsSection
-        batters={appData.topBatters || []}
-        bowlers={appData.topBowlers || []}
-      />
+      <ErrorBoundary fallbackMessage="Analytics charts failed to load.">
+        <AnalyticsSection
+          batters={appData.topBatters || []}
+          bowlers={appData.topBowlers || []}
+        />
+      </ErrorBoundary>
 
       {/* ══════ COMPARE PLAYERS ══════ */}
-      <ComparePlayers players={allPlayers} />
+      <ErrorBoundary fallbackMessage="Player comparison failed to load.">
+        <ComparePlayers players={allPlayers} />
+      </ErrorBoundary>
 
       {/* ══════ MATCH PREDICTOR ══════ */}
-      <MatchPredictor
-        teamWins={appData.teamWins || []}
-        topBatters={appData.topBatters || []}
-        topBowlers={appData.topBowlers || []}
-      />
+      <ErrorBoundary fallbackMessage="Match predictor failed to load.">
+        <MatchPredictor
+          teamWins={appData.teamWins || []}
+          topBatters={appData.topBatters || []}
+          topBowlers={appData.topBowlers || []}
+        />
+      </ErrorBoundary>
 
       {/* ══════ PLAYERS ══════ */}
       <section id="players" aria-labelledby={filterTitleId}
