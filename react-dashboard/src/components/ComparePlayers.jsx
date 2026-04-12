@@ -404,11 +404,11 @@ const ComparePlayers = ({ players = [], defaultIdA = '', defaultIdB = '' }) => {
   const stats = useMemo(() => {
     if (!canCompare) return [];
     return [
-      { label: 'Runs',        a: playerA.runs,        b: playerB.runs,        higherIsBetter: true,  format: v => v ?? 'â€”' },
-      { label: 'Wickets',     a: playerA.wickets,     b: playerB.wickets,     higherIsBetter: true,  format: v => v ?? 'â€”' },
-      { label: 'Strike Rate', a: playerA.strikeRate,  b: playerB.strikeRate,  higherIsBetter: true,  format: v => v != null ? Number(v).toFixed(1) : 'â€”' },
-      { label: 'Economy',     a: playerA.economy,     b: playerB.economy,     higherIsBetter: false, format: v => v != null ? Number(v).toFixed(2) : 'â€”' },
-      { label: 'Balls',       a: playerA.balls,       b: playerB.balls,       higherIsBetter: true,  format: v => v ?? 'â€”' },
+      { label: 'Runs',        a: playerA.runs,        b: playerB.runs,        higherIsBetter: true,  format: v => v ?? '\u2014' },
+      { label: 'Wickets',     a: playerA.wickets,     b: playerB.wickets,     higherIsBetter: true,  format: v => v ?? '\u2014' },
+      { label: 'Strike Rate', a: playerA.strikeRate,  b: playerB.strikeRate,  higherIsBetter: true,  format: v => v != null ? Number(v).toFixed(1) : '\u2014' },
+      { label: 'Economy',     a: playerA.economy,     b: playerB.economy,     higherIsBetter: false, format: v => v != null ? Number(v).toFixed(2) : '\u2014' },
+      { label: 'Balls',       a: playerA.balls,       b: playerB.balls,       higherIsBetter: true,  format: v => v ?? '\u2014' },
     ];
   }, [canCompare, playerA, playerB]);
 
