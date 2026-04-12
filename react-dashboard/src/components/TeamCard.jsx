@@ -8,6 +8,11 @@ const RANK_CONFIG = {
   3: { label: '🥉 Semi-final',  border: 'rgba(52,211,153,0.25)',   glow: 'rgba(52,211,153,0.07)',  text: 'text-green-300', pill: 'pill-green' },
 };
 
+/** Signature background colour shown behind each team's crest image */
+const TEAM_FLAG_BG = {
+  'West Indies': '#6B0F1A',
+};
+
 const TeamCard = memo(({ team, wins, rank, group, flag }) => {
   const [flagFailed, setFlagFailed] = useState(false);
 
@@ -75,7 +80,8 @@ const TeamCard = memo(({ team, wins, rank, group, flag }) => {
 
       {/* Flag */}
       <div className="relative">
-        <div className="w-24 h-16 rounded-xl overflow-hidden border border-white/15 shadow-xl">
+        <div className="w-24 h-16 rounded-xl overflow-hidden border border-white/15 shadow-xl"
+          style={TEAM_FLAG_BG[team] ? { backgroundColor: TEAM_FLAG_BG[team] } : {}}>
           {!flagFailed && flag ? (
             <img src={flag} alt={`${team} flag`}
               className="w-full h-full object-contain"
