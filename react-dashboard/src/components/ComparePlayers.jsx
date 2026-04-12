@@ -392,6 +392,37 @@ function buildInsights(playerA, playerB) {
   return lines.slice(0, 3);
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   VERDICT SUMMARY — one-sentence human-readable comparison result
+   ─────────────────────────────────────────────────────────────────────────── */
+function buildVerdictSummary(verdict, playerA, playerB, stats) {
+  if (!verdict) return '';
+  const last = name => name.split(' ').pop();
+  if (verdict.draw) {
+    return `A perfect dead heat \u2014 both players win exactly ${verdict.winsA} categor${verdict.winsA !== 1 ? 'ies' : 'y'} each.`;
+  }
+  const winner = verdict.winner;
+  const loser  = winner === playerA ? playerB : playerA;
+  const winsCount = winner === playerA ? verdict.winsA : verdict.winsB;
+  const total  = stats.length;
+
+  // Find which labels the winner leads in
+  const strongIn = stats
+    .filter(({ a, b, higherIsBetter }) => {
+      const na = parseFloat(a) || 0, nb = parseFloat(b) || 0;
+      if (na === nb) return false;
+      if (winner === playerA) {
+        return higherIsBetter ? na > nb : (na > 0 && na < nb) || (na > 0 && nb === 0);
+      }
+      return higherIsBetter ? nb > na : (nb > 0 && nb < na) || (nb > 0 && na === 0);
+    })
+    .map(s => s.label);
+
+  const edge = strongIn.slice(0, 2).join(' & ');
+  const dominance = winsCount >= Math.ceil(total * 0.8) ? 'dominates' : 'edges ahead in';
+  return `${last(winner.name)} ${dominance} ${winsCount} of ${total} categories${edge ? ` \u2014 stronger in ${edge}` : ''}. ${last(loser.name)} trails behind overall.`;
+}
+
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    MAIN COMPONENT
    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
@@ -445,6 +476,11 @@ const ComparePlayers = ({ players = [], defaultIdA = '', defaultIdB = '' }) => {
   const insights = useMemo(
     () => (canCompare ? buildInsights(playerA, playerB) : []),
     [canCompare, playerA, playerB],
+  );
+
+  const verdictSummary = useMemo(
+    () => (canCompare && verdict ? buildVerdictSummary(verdict, playerA, playerB, stats) : ''),
+    [canCompare, verdict, playerA, playerB, stats],
   );
 
   const aIsWinner = canCompare && !!verdict && !verdict.draw && verdict.winner === playerA;
@@ -668,6 +704,16 @@ const ComparePlayers = ({ players = [], defaultIdA = '', defaultIdB = '' }) => {
                             <span className="text-icc-gold font-bold">{verdict.winsA}</span>{' '}
                             categor{verdict.winsA !== 1 ? 'ies' : 'y'} each.
                           </p>
+                          {verdictSummary && (
+                            <motion.p
+                              initial={{ opacity: 0, y: 6 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.4, delay: 0.4 }}
+                              className="text-[10px] text-white/35 italic mt-2 leading-relaxed"
+                            >
+                              {verdictSummary}
+                            </motion.p>
+                          )}
                         </div>
                       </div>
                     ) : (
@@ -702,6 +748,19 @@ const ComparePlayers = ({ players = [], defaultIdA = '', defaultIdB = '' }) => {
                           nameB={playerB.name.split(' ').slice(-1)[0]}
                           winnerIsA={verdict.winner === playerA}
                         />
+
+                        {/* Verdict summary sentence */}
+                        {verdictSummary && (
+                          <motion.p
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4, delay: 0.5 }}
+                            className="mt-4 text-center text-[11px] text-white/40 leading-relaxed
+                                       italic border-t border-white/[0.06] pt-4"
+                          >
+                            {verdictSummary}
+                          </motion.p>
+                        )}
                       </>
                     )}
                   </motion.div>

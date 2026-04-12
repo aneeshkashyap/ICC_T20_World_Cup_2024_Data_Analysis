@@ -15,6 +15,7 @@ import StatsTicker      from '../components/StatsTicker';
 import { SectionError } from '../components/Skeletons';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import ComparePlayers   from '../components/ComparePlayers';
+import InsightEngine     from '../components/InsightEngine';
 import MatchPredictor   from '../components/MatchPredictor';
 import { useDeferredData, useDebounce } from '../hooks';
 import appData from '../data.json';
@@ -630,6 +631,18 @@ const Dashboard = () => {
             bowlers={appData.topBowlers || []}
             players={players || []}
           />
+        </motion.div>
+      </ErrorBoundary>
+
+      {/* ══════ INSIGHT ENGINE ══════ */}
+      <ErrorBoundary fallbackMessage="Insight engine failed to load.">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <InsightEngine players={allPlayers} />
         </motion.div>
       </ErrorBoundary>
 
