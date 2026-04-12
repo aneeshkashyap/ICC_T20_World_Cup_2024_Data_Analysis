@@ -42,7 +42,7 @@ function App() {
 
       <main
         id="main-content"
-        className="pt-14"
+        className="pt-14 bg-gradient-to-br from-[#0B1E3C] via-[#020617] to-black min-h-screen text-white"
         role="main"
         aria-label="ICC T20 World Cup 2024 Analytics Dashboard"
       >

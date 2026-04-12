@@ -218,7 +218,7 @@ const MatchPredictor = ({ teamWins = [], topBatters = [], topBowlers = [] }) => 
           <p className="eyebrow mb-4" aria-hidden="true">AI Insights</p>
           <h2
             id="predictor-heading"
-            className="font-condensed font-black text-4xl sm:text-5xl text-white uppercase tracking-wide"
+            className="font-condensed font-bold text-5xl text-white uppercase tracking-wide"
           >
             Match Predictor
           </h2>

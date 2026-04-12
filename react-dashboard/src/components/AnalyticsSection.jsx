@@ -162,7 +162,7 @@ const AnimCard = ({ children, delay = 0, className = '' }) => (
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, margin: '-60px' }}
     transition={{ duration: 0.55, delay, ease: [0.16, 1, 0.3, 1] }}
-    className={`glass-card rounded-2xl p-6 ${className}`}
+    className={`backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 p-6 ${className}`}
   >
     {children}
   </motion.div>
@@ -593,7 +593,7 @@ const AnalyticsSection = memo(({ batters = [], bowlers = [], players = [] }) => 
             <p className="eyebrow mb-4" aria-hidden="true">Data Insights</p>
             <h2
               id="analytics-heading"
-              className="font-condensed font-black text-4xl sm:text-5xl text-white uppercase tracking-wide"
+              className="font-condensed font-bold text-5xl text-white uppercase tracking-wide"
             >
               Analytics
             </h2>

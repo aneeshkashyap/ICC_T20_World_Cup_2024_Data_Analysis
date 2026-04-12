@@ -229,7 +229,7 @@ const SectionHeader = memo(({ eyebrow, title, id }) => (
     className="text-center mb-10"
   >
     <p className="eyebrow mb-4" aria-hidden="true">{eyebrow}</p>
-    <h2 id={id} className="font-condensed font-black text-4xl sm:text-5xl text-white uppercase tracking-wide">
+    <h2 id={id} className="font-condensed font-bold text-5xl text-white uppercase tracking-wide">
       {title}
     </h2>
     <div className="w-16 h-0.5 bg-icc-gold rounded-full mx-auto mt-3" aria-hidden="true" />

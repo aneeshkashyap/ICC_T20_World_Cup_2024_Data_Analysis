@@ -604,7 +604,7 @@ const ComparePlayers = ({ players = [], defaultIdA = '', defaultIdB = '' }) => {
           <p className="eyebrow mb-4" aria-hidden="true">Head to Head</p>
           <h2
             id="compare-heading"
-            className="font-condensed font-black text-4xl sm:text-5xl text-white uppercase tracking-wide"
+            className="font-condensed font-bold text-5xl text-white uppercase tracking-wide"
           >
             Player Comparison
           </h2>

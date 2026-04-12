@@ -129,7 +129,9 @@ const PlayerCard = memo(({ player, index = 0, maxRuns = 300, maxWickets = 20,
       style={{ rotateX, rotateY, transformPerspective: 900, transformStyle: 'preserve-3d' }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`player-card rounded-2xl overflow-hidden flex flex-col group relative
+      className={`backdrop-blur-lg bg-white/5 border border-white/10 rounded-2xl shadow-lg
+                 hover:shadow-2xl transition duration-300
+                 overflow-hidden flex flex-col group relative
                  ${compareMode ? 'cursor-pointer' : 'cursor-default'}
                  ${isSelected ? 'ring-2 ring-icc-gold shadow-[0_0_24px_4px_rgba(255,215,0,0.22)]' : ''}`}
       aria-label={`${name}, ${team}, ${role}`}
