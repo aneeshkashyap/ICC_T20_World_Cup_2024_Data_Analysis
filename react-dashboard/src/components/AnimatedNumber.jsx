@@ -9,9 +9,9 @@ import { useInView } from 'framer-motion';
  * @param {string}  suffix     - Optional suffix (e.g., "+", "%")
  * @param {string}  prefix     - Optional prefix (e.g., "₹")
  */
-const AnimatedNumber = ({ value = 0, duration = 1500, className = '', suffix = '', prefix = '' }) => {
+const AnimatedNumber = ({ value = 0, duration = 1500, className = '', suffix = '', prefix = '', margin = '-80px' }) => {
   const ref       = useRef(null);
-  const inView    = useInView(ref, { once: true, margin: '-80px' });
+  const inView    = useInView(ref, { once: true, margin });
   const [display, setDisplay] = useState(0);
   const frameRef  = useRef(null);
 

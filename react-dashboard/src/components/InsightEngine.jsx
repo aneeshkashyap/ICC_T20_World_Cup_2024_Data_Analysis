@@ -140,6 +140,7 @@ const SpotlightCard = ({ spot, index }) => {
             <AnimatedNumber
               value={Number(spot.displayValue)}
               duration={1400}
+              margin="0px"
               className="font-condensed font-black text-4xl leading-none"
               style={{ color: spot.accent }}
             />
