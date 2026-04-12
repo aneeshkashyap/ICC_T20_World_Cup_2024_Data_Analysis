@@ -1,10 +1,22 @@
-import React, { useState, useMemo, memo, useEffect, useCallback } from 'react';
+﻿import React, { useState, useMemo, memo, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CLEAN STAT HELPER
+   Returns '-' for any null / undefined / NaN / empty-string value so the UI
+   never renders corrupted characters or blank cells.
+   ─────────────────────────────────────────────────────────────────────────── */
+function cleanStat(value) {
+  if (value === null || value === undefined || value === '') return '-';
+  const n = Number(value);
+  if (isNaN(n)) return '-';
+  return value;
+}
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    DUAL BAR
-   Two bars grow from the centre outward â€” A leftward, B rightward.
-   pctA / pctB are each 0â€“50 (% of total container width).
+   Two bars grow from the centre outward - A leftward, B rightward.
+   pctA / pctB are each 0-50 (% of total container width).
    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const DualBar = memo(({ numA, numB, aWins, bWins, delay = 0 }) => {
   const maxVal = Math.max(numA, numB, 1);
@@ -49,7 +61,7 @@ DualBar.displayName = 'DualBar';
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    STAT ROW
    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-const StatRow = memo(({ label, a, b, higherIsBetter = true, format = v => v ?? 'â€”', rowIdx = 0 }) => {
+const StatRow = memo(({ label, a, b, higherIsBetter = true, format = v => cleanStat(v), rowIdx = 0 }) => {
   const numA  = parseFloat(a) || 0;
   const numB  = parseFloat(b) || 0;
   const isTie = numA === numB;
@@ -130,7 +142,7 @@ const StatRow = memo(({ label, a, b, higherIsBetter = true, format = v => v ?? '
 StatRow.displayName = 'StatRow';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   PLAYER AVATAR â€” winner crown + win-count chip
+   PLAYER AVATAR - winner crown + win-count chip
    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const PlayerAvatar = memo(({ player, side, isWinner = false, winCount = 0, totalStats = 0 }) => {
   const [imgError, setImgError] = React.useState(false);
@@ -244,7 +256,7 @@ const InsightBullet = memo(({ icon, text, delay }) => (
 InsightBullet.displayName = 'InsightBullet';
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   WIN-RATIO BAR â€” stacked A|B using absolute positioning
+   WIN-RATIO BAR - stacked A|B using absolute positioning
    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const WinRatioBar = memo(({ winsA, winsB, total, nameA, nameB, winnerIsA }) => (
   <div>
@@ -404,11 +416,11 @@ const ComparePlayers = ({ players = [], defaultIdA = '', defaultIdB = '' }) => {
   const stats = useMemo(() => {
     if (!canCompare) return [];
     return [
-      { label: 'Runs',        a: playerA.runs,        b: playerB.runs,        higherIsBetter: true,  format: v => v ?? '\u2014' },
-      { label: 'Wickets',     a: playerA.wickets,     b: playerB.wickets,     higherIsBetter: true,  format: v => v ?? '\u2014' },
-      { label: 'Strike Rate', a: playerA.strikeRate,  b: playerB.strikeRate,  higherIsBetter: true,  format: v => v != null ? Number(v).toFixed(1) : '\u2014' },
-      { label: 'Economy',     a: playerA.economy,     b: playerB.economy,     higherIsBetter: false, format: v => v != null ? Number(v).toFixed(2) : '\u2014' },
-      { label: 'Balls',       a: playerA.balls,       b: playerB.balls,       higherIsBetter: true,  format: v => v ?? '\u2014' },
+      { label: 'Runs',        a: playerA.runs,        b: playerB.runs,        higherIsBetter: true,  format: v => cleanStat(v) },
+      { label: 'Wickets',     a: playerA.wickets,     b: playerB.wickets,     higherIsBetter: true,  format: v => cleanStat(v) },
+      { label: 'Strike Rate', a: playerA.strikeRate,  b: playerB.strikeRate,  higherIsBetter: true,  format: v => cleanStat(v) === '-' ? '-' : Number(v).toFixed(1) },
+      { label: 'Economy',     a: playerA.economy,     b: playerB.economy,     higherIsBetter: false, format: v => cleanStat(v) === '-' ? '-' : Number(v).toFixed(2) },
+      { label: 'Balls',       a: playerA.balls,       b: playerB.balls,       higherIsBetter: true,  format: v => cleanStat(v) },
     ];
   }, [canCompare, playerA, playerB]);
 
