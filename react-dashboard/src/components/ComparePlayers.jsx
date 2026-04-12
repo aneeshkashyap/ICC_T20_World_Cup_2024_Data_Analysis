@@ -180,14 +180,24 @@ const PlayerAvatar = memo(({ player, side, isWinner = false, winCount = 0, total
           )}
         </AnimatePresence>
 
-        {/* Avatar with animated ring */}
-        <motion.div
-          animate={isWinner
-            ? { boxShadow: '0 0 0 2px rgba(52,211,153,0.7), 0 0 24px rgba(52,211,153,0.3)' }
-            : { boxShadow: '0 0 0 2px rgba(251,191,36,0.22)' }}
-          transition={{ duration: 0.5 }}
-          className="w-20 h-20 rounded-full overflow-hidden"
-        >
+        {/* Avatar with animated ring — pulsing halo when dominant (≥75% wins) */}
+        <div className="relative">
+          {isWinner && winCount >= Math.ceil(totalStats * 0.75) && (
+            <motion.div
+              className="absolute inset-0 rounded-full pointer-events-none z-10"
+              style={{ border: '2px solid rgba(52,211,153,0.55)' }}
+              animate={{ scale: [1, 1.4, 1], opacity: [0.65, 0, 0.65] }}
+              transition={{ duration: 1.9, repeat: Infinity, ease: 'easeOut' }}
+              aria-hidden="true"
+            />
+          )}
+          <motion.div
+            animate={isWinner
+              ? { boxShadow: '0 0 0 2px rgba(52,211,153,0.7), 0 0 24px rgba(52,211,153,0.3)' }
+              : { boxShadow: '0 0 0 2px rgba(251,191,36,0.22)' }}
+            transition={{ duration: 0.5 }}
+            className="w-20 h-20 rounded-full overflow-hidden"
+          >
           <img
             src={src}
             alt={player.name}
@@ -196,7 +206,8 @@ const PlayerAvatar = memo(({ player, side, isWinner = false, winCount = 0, total
             width={80} height={80}
             onError={() => setImgError(true)}
           />
-        </motion.div>
+          </motion.div>
+        </div>{/* /inner relative for halo */}
 
         {/* Role badge */}
         <span className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full
@@ -423,6 +434,89 @@ function buildVerdictSummary(verdict, playerA, playerB, stats) {
   return `${last(winner.name)} ${dominance} ${winsCount} of ${total} categories${edge ? ` \u2014 stronger in ${edge}` : ''}. ${last(loser.name)} trails behind overall.`;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   DOMAIN VERDICT — batting vs bowling dominance breakdown
+   ─────────────────────────────────────────────────────────────────────────── */
+function buildDomainVerdicts(playerA, playerB) {
+  const last = n => n.split(' ').pop();
+  const nameA = last(playerA.name), nameB = last(playerB.name);
+
+  const runsA = playerA.runs    || 0, runsB  = playerB.runs    || 0;
+  const srA   = parseFloat(playerA.strikeRate) || 0;
+  const srB   = parseFloat(playerB.strikeRate) || 0;
+  const wkA   = playerA.wickets || 0, wkB    = playerB.wickets || 0;
+  const econA = parseFloat(playerA.economy)   || 0;
+  const econB = parseFloat(playerB.economy)   || 0;
+
+  // Batting domain: Runs + Strike Rate (both higher = better)
+  let batA = 0, batB = 0;
+  if (runsA > runsB) batA++; else if (runsB > runsA) batB++;
+  if (srA   > srB  ) batA++; else if (srB   > srA  ) batB++;
+
+  // Bowling domain: Wickets (higher = better) + Economy (lower = better)
+  let bowlA = 0, bowlB = 0;
+  if (wkA > wkB) bowlA++; else if (wkB > wkA) bowlB++;
+  if (econA > 0 && econB > 0) {
+    if (econA < econB) bowlA++; else if (econB < econA) bowlB++;
+  } else if (econA > 0 && econB === 0) bowlA++;
+    else if (econB > 0 && econA === 0) bowlB++;
+
+  const batWinner  = batA  > batB  ? 'A' : batB  > batA  ? 'B' : 'tie';
+  const bowlWinner = bowlA > bowlB ? 'A' : bowlB > bowlA ? 'B' : 'tie';
+
+  return {
+    batting: {
+      winner: batWinner,
+      label:  batWinner === 'A'
+        ? `${nameA} dominates batting`
+        : batWinner === 'B'
+        ? `${nameB} dominates batting`
+        : 'Batting is level',
+    },
+    bowling: {
+      winner: bowlWinner,
+      label:  bowlWinner === 'A'
+        ? `${nameA} leads bowling`
+        : bowlWinner === 'B'
+        ? `${nameB} leads bowling`
+        : 'Bowling is level',
+    },
+  };
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DOMAIN CHIP — small pill badge for batting/bowling verdict
+   ─────────────────────────────────────────────────────────────────────────── */
+const DomainChip = memo(({ icon, label, winner, accent, delay = 0 }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.88, y: 8 }}
+    animate={{ opacity: 1, scale: 1, y: 0 }}
+    transition={{ type: 'spring', stiffness: 360, damping: 22, delay }}
+    className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl border
+               text-[11px] font-bold min-w-0 cursor-default"
+    style={{ borderColor: `${accent}44`, background: `${accent}12`, color: accent }}
+  >
+    <span className="text-base shrink-0 select-none" aria-hidden="true">{icon}</span>
+    <span className="truncate leading-tight">{label}</span>
+    {winner !== 'tie' && (
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: delay + 0.3 }}
+        className="ml-auto shrink-0 text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5
+                   rounded-full"
+        style={{ background: `${accent}22`, color: accent }}
+      >
+        Edge
+      </motion.span>
+    )}
+  </motion.div>
+));
+DomainChip.displayName = 'DomainChip';
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MAIN COMPONENT
+
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    MAIN COMPONENT
    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
@@ -481,6 +575,11 @@ const ComparePlayers = ({ players = [], defaultIdA = '', defaultIdB = '' }) => {
   const verdictSummary = useMemo(
     () => (canCompare && verdict ? buildVerdictSummary(verdict, playerA, playerB, stats) : ''),
     [canCompare, verdict, playerA, playerB, stats],
+  );
+
+  const domainVerdicts = useMemo(
+    () => (canCompare ? buildDomainVerdicts(playerA, playerB) : null),
+    [canCompare, playerA, playerB],
   );
 
   const aIsWinner = canCompare && !!verdict && !verdict.draw && verdict.winner === playerA;
@@ -714,6 +813,25 @@ const ComparePlayers = ({ players = [], defaultIdA = '', defaultIdB = '' }) => {
                               {verdictSummary}
                             </motion.p>
                           )}
+                          {/* Domain chips — still shown in a draw so the breakdown is visible */}
+                          {domainVerdicts && (
+                            <div className="flex gap-2 mt-3 w-full max-w-xs">
+                              <DomainChip
+                                icon={String.fromCodePoint(0x1F3CF)}
+                                label={domainVerdicts.batting.label}
+                                winner={domainVerdicts.batting.winner}
+                                accent="#FFD700"
+                                delay={0.42}
+                              />
+                              <DomainChip
+                                icon={String.fromCodePoint(0x26A1)}
+                                label={domainVerdicts.bowling.label}
+                                winner={domainVerdicts.bowling.winner}
+                                accent="#34D399"
+                                delay={0.52}
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
                     ) : (
@@ -721,6 +839,31 @@ const ComparePlayers = ({ players = [], defaultIdA = '', defaultIdB = '' }) => {
                         <div className="flex items-center justify-center gap-3 mb-5">
                           <span className="text-2xl select-none" aria-hidden="true">{String.fromCodePoint(0x1F3C6)}</span>
                           <div className="text-center">
+                            {/* DOMINANT badge — shown when winner sweeps 4+ of 5 categories */}
+                            {(verdict.winner === playerA ? verdict.winsA : verdict.winsB) >= Math.ceil(stats.length * 0.75) && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.7, y: -6 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                transition={{ type: 'spring', stiffness: 420, damping: 18, delay: 0.3 }}
+                                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full mb-2
+                                           text-[9px] font-black uppercase tracking-[0.2em] select-none
+                                           border border-amber-400/40"
+                                style={{
+                                  background: 'linear-gradient(90deg, rgba(251,191,36,0.15), rgba(234,179,8,0.08))',
+                                  color: '#FCD34D',
+                                  boxShadow: '0 0 18px rgba(251,191,36,0.18)',
+                                }}
+                              >
+                                <motion.span
+                                  animate={{ rotate: [0, 15, -15, 0] }}
+                                  transition={{ duration: 1.8, repeat: Infinity, repeatDelay: 2.5 }}
+                                  aria-hidden="true"
+                                >
+                                  {String.fromCodePoint(0x1F525)}
+                                </motion.span>
+                                Dominant
+                              </motion.div>
+                            )}
                             <p className="text-[9px] text-emerald-400/65 uppercase
                                           tracking-widest font-bold mb-0.5">
                               Overall Winner
@@ -748,6 +891,26 @@ const ComparePlayers = ({ players = [], defaultIdA = '', defaultIdB = '' }) => {
                           nameB={playerB.name.split(' ').slice(-1)[0]}
                           winnerIsA={verdict.winner === playerA}
                         />
+
+                        {/* Domain verdict chips — batting & bowling breakdown */}
+                        {domainVerdicts && (
+                          <div className="flex gap-2.5 mt-4">
+                            <DomainChip
+                              icon={String.fromCodePoint(0x1F3CF)}
+                              label={domainVerdicts.batting.label}
+                              winner={domainVerdicts.batting.winner}
+                              accent="#FFD700"
+                              delay={0.45}
+                            />
+                            <DomainChip
+                              icon={String.fromCodePoint(0x26A1)}
+                              label={domainVerdicts.bowling.label}
+                              winner={domainVerdicts.bowling.winner}
+                              accent="#34D399"
+                              delay={0.55}
+                            />
+                          </div>
+                        )}
 
                         {/* Verdict summary sentence */}
                         {verdictSummary && (

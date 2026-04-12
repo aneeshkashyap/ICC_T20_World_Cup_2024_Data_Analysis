@@ -9,7 +9,8 @@ import { PLAYER_PHOTOS } from '../playerPhotos';
    Derived entirely from the players prop — no extra data fetching needed.
    ─────────────────────────────────────────────────────────────────────────── */
 
-const MIN_BALLS_FOR_SR = 30; // Minimum balls faced to qualify for SR spotlight
+const MIN_BALLS_FOR_SR  = 30; // Minimum balls faced to qualify for SR spotlight
+const MIN_WICKETS_ECON  = 1;  // Minimum wickets taken to qualify for economy spotlight
 
 /* ─── Avatar with photo fallback ─── */
 const SpotlightAvatar = ({ player, ring }) => {
@@ -186,17 +187,19 @@ const InsightEngine = ({ players = [] }) => {
     const withSR      = players.filter(p =>
       parseFloat(p.strikeRate) > 0 && (p.balls || 0) >= MIN_BALLS_FOR_SR
     );
+    const withEconomy = players.filter(p =>
+      parseFloat(p.economy) > 0 && (p.wickets || 0) >= MIN_WICKETS_ECON
+    );
 
-    // Sort descending
-    const topScorer  = [...withRuns].sort((a, b) => (b.runs    || 0) - (a.runs    || 0))[0];
-    const bestBowler = [...withWickets].sort((a, b) => (b.wickets || 0) - (a.wickets || 0))[0];
-    const fastStriker = [...withSR].sort(
+    // Sort descending / ascending
+    const topScorer     = [...withRuns].sort((a, b) => (b.runs    || 0) - (a.runs    || 0))[0];
+    const bestBowler    = [...withWickets].sort((a, b) => (b.wickets || 0) - (a.wickets || 0))[0];
+    const fastStriker   = [...withSR].sort(
       (a, b) => parseFloat(b.strikeRate) - parseFloat(a.strikeRate)
     )[0];
-
-    const maxRuns    = topScorer?.runs    || 1;
-    const maxWickets = bestBowler?.wickets || 1;
-    const maxSR      = parseFloat(fastStriker?.strikeRate) || 1;
+    const bestEconomist = [...withEconomy].sort(
+      (a, b) => parseFloat(a.economy) - parseFloat(b.economy)   // ascending — lower is better
+    )[0];
 
     return [
       topScorer && {
@@ -242,13 +245,30 @@ const InsightEngine = ({ players = [] }) => {
         displayValue: Number(fastStriker.strikeRate).toFixed(1),
         unit:         'SR',
         pct:          Math.min(100, Math.round((parseFloat(fastStriker.strikeRate) / 200) * 100)),
-        barLabel:     `/ 200 benchmark`,
+        barLabel:     '/ 200 benchmark',
         secondaryStat: fastStriker.runs
           ? { label: 'Runs', value: fastStriker.runs }
           : null,
         accent: '#818CF8',
         glow:   'rgba(129,140,248,0.16)',
         border: 'rgba(129,140,248,0.28)',
+      },
+      bestEconomist && {
+        key:          'economy',
+        eyebrow:      'Best Economy',
+        subtitle:     'Tightest bowler — runs per over',
+        icon:         String.fromCodePoint(0x1F512), // 🔒
+        player:       bestEconomist,
+        displayValue: Number(bestEconomist.economy).toFixed(2),
+        unit:         'econ',
+        pct:          100,
+        barLabel:     'Tournament best (lower = better)',
+        secondaryStat: bestEconomist.wickets
+          ? { label: 'Wickets', value: bestEconomist.wickets }
+          : null,
+        accent: '#FB923C',
+        glow:   'rgba(251,146,60,0.16)',
+        border: 'rgba(251,146,60,0.28)',
       },
     ].filter(Boolean);
   }, [players]);
@@ -284,7 +304,7 @@ const InsightEngine = ({ players = [] }) => {
         </motion.div>
 
         {/* Cards grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {spots.map((spot, i) => (
             <SpotlightCard key={spot.key} spot={spot} index={i} />
           ))}
