@@ -12,15 +12,16 @@ import { useInView } from 'framer-motion';
 const AnimatedNumber = ({ value = 0, duration = 1500, className = '', suffix = '', prefix = '', margin = '-80px' }) => {
   const ref       = useRef(null);
   const inView    = useInView(ref, { once: true, margin });
-  const [display, setDisplay] = useState(0);
+  const endVal    = Number(value) || 0;
+  // Start at the real value so there is never a "0" flash before inView fires
+  const [display, setDisplay] = useState(endVal);
   const frameRef  = useRef(null);
 
   useEffect(() => {
     if (!inView) return;
 
-    const start     = performance.now();
-    const startVal  = 0;
-    const endVal    = Number(value) || 0;
+    const start    = performance.now();
+    const startVal = 0;
 
     const tick = (now) => {
       const elapsed  = now - start;
@@ -29,11 +30,13 @@ const AnimatedNumber = ({ value = 0, duration = 1500, className = '', suffix = '
       const eased    = 1 - Math.pow(1 - progress, 3);
       setDisplay(Math.round(startVal + (endVal - startVal) * eased));
       if (progress < 1) frameRef.current = requestAnimationFrame(tick);
+      else setDisplay(endVal); // guarantee final value is exact
     };
 
+    setDisplay(0); // reset to 0 so animation starts from zero
     frameRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frameRef.current);
-  }, [inView, value, duration]);
+  }, [inView, endVal, duration]);
 
   return (
     <span ref={ref} className={className} aria-label={`${prefix}${value.toLocaleString()}${suffix}`}>
