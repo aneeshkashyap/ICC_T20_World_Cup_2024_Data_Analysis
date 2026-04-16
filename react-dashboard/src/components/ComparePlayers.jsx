@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo, memo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, memo, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -360,15 +360,18 @@ function buildInsights(playerA, playerB) {
       const diff    = Math.abs(runsA - runsB);
       const diffPct = (diff / Math.max(runsA, runsB)) * 100;
       if (diffPct > 20) {
-        const leader = runsA > runsB ? nameA : nameB;
-        lines.push({ icon: String.fromCodePoint(0x1F3CF), text: `${leader} is the stronger batsman, scoring ${diff} more run${diff !== 1 ? 's' : ''} this tournament.` });
+        const leader  = runsA > runsB ? nameA : nameB;
+        const trailer = runsA > runsB ? nameB : nameA;
+        const lRuns   = runsA > runsB ? runsA : runsB;
+        const tRuns   = runsA > runsB ? runsB : runsA;
+        lines.push({ icon: String.fromCodePoint(0x1F3CF), text: `${leader} dominates batting with ${lRuns} runs vs ${trailer}'s ${tRuns} — a ${diff}-run gap (${Math.round(diffPct)}% ahead).` });
       } else {
-        lines.push({ icon: String.fromCodePoint(0x1F3CF), text: `Bat for bat \u2014 both players are within ${Math.round(diffPct)}% of each other on runs.` });
+        lines.push({ icon: String.fromCodePoint(0x1F3CF), text: `Bat for bat — ${nameA} has ${runsA} runs vs ${nameB}'s ${runsB}. Within ${Math.round(diffPct)}% of each other.` });
       }
     } else if (runsA > 0 && !batB) {
-      lines.push({ icon: String.fromCodePoint(0x1F3CF), text: `${nameA} is the specialist batsman here with ${runsA} runs.` })
+      lines.push({ icon: String.fromCodePoint(0x1F3CF), text: `${nameA} is the specialist batsman with ${runsA} runs, while ${nameB} focuses elsewhere.` });
     } else if (runsB > 0 && !batA) {
-      lines.push({ icon: String.fromCodePoint(0x1F3CF), text: `${nameB} is the specialist batsman here with ${runsB} runs.` })
+      lines.push({ icon: String.fromCodePoint(0x1F3CF), text: `${nameB} is the specialist batsman with ${runsB} runs, while ${nameA} focuses elsewhere.` });
     }
   }
 
@@ -380,24 +383,30 @@ function buildInsights(playerA, playerB) {
   if (bowlA || bowlB) {
     if (wktsA > 0 && wktsB > 0) {
       if (wktsA !== wktsB) {
-        const leader = wktsA > wktsB ? nameA : nameB;
-        const diff   = Math.abs(wktsA - wktsB);
-        lines.push({ icon: String.fromCodePoint(0x1F3AF), text: `${leader} is the more dangerous bowler, taking ${diff} extra wicket${diff !== 1 ? 's' : ''}.` });
+        const leader  = wktsA > wktsB ? nameA : nameB;
+        const trailer = wktsA > wktsB ? nameB : nameA;
+        const lWkts   = wktsA > wktsB ? wktsA : wktsB;
+        const tWkts   = wktsA > wktsB ? wktsB : wktsA;
+        const diff    = Math.abs(wktsA - wktsB);
+        lines.push({ icon: String.fromCodePoint(0x1F3AF), text: `${leader} is deadlier with the ball — ${lWkts} wickets vs ${trailer}'s ${tWkts} (${diff} wicket${diff !== 1 ? 's' : ''} more).` });
       } else {
-        lines.push({ icon: String.fromCodePoint(0x1F3AF), text: `Dead heat with the ball \u2014 both took ${wktsA} wicket${wktsA !== 1 ? 's' : ''}.` });
+        lines.push({ icon: String.fromCodePoint(0x1F3AF), text: `Perfectly matched with the ball — both took exactly ${wktsA} wicket${wktsA !== 1 ? 's' : ''} this tournament.` });
       }
     } else if (wktsA > 0 && wktsB === 0) {
-      lines.push({ icon: String.fromCodePoint(0x1F3AF), text: `Only ${nameA} has taken wickets \u2014 the clear bowling threat.` });
+      lines.push({ icon: String.fromCodePoint(0x1F3AF), text: `Only ${nameA} has taken wickets (${wktsA}) — the clear bowling threat here.` });
     } else if (wktsB > 0 && wktsA === 0) {
-      lines.push({ icon: String.fromCodePoint(0x1F3AF), text: `Only ${nameB} has taken wickets \u2014 the clear bowling threat.` });
+      lines.push({ icon: String.fromCodePoint(0x1F3AF), text: `Only ${nameB} has taken wickets (${wktsB}) — the clear bowling threat here.` });
     }
   }
 
   const srA = parseFloat(playerA.strikeRate) || 0;
   const srB = parseFloat(playerB.strikeRate) || 0;
   if (srA > 0 && srB > 0 && Math.abs(srA - srB) > 15) {
-    const faster = srA > srB ? nameA : nameB;
-    lines.push({ icon: String.fromCodePoint(0x26A1), text: `${faster} attacks at a noticeably higher strike rate, bringing extra explosive power.` });
+    const faster  = srA > srB ? nameA : nameB;
+    const slower  = srA > srB ? nameB : nameA;
+    const fSR     = (srA > srB ? srA : srB).toFixed(1);
+    const sSR     = (srA > srB ? srB : srA).toFixed(1);
+    lines.push({ icon: String.fromCodePoint(0x26A1), text: `${faster} is far more aggressive (SR ${fSR}) vs ${slower} (SR ${sSR}) — a ${Math.abs(srA - srB).toFixed(1)}-point tempo edge.` });
   }
 
   return lines.slice(0, 3);

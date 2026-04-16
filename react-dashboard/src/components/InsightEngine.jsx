@@ -78,6 +78,15 @@ const SpotlightCard = ({ spot, index }) => {
         aria-hidden="true"
       />
 
+      {/* Animated ambient orb */}
+      <motion.div
+        className="absolute -bottom-8 -right-8 w-28 h-28 rounded-full pointer-events-none"
+        style={{ background: `radial-gradient(circle, ${spot.glow} 0%, transparent 70%)`, filter: 'blur(20px)' }}
+        animate={{ scale: [1, 1.25, 1], opacity: [0.5, 0.85, 0.5] }}
+        transition={{ duration: 4 + index, repeat: Infinity, ease: 'easeInOut' }}
+        aria-hidden="true"
+      />
+
       {/* Header: icon + title */}
       <div className="relative flex items-center gap-2.5">
         <motion.span
@@ -173,10 +182,50 @@ const SpotlightCard = ({ spot, index }) => {
         <p className="text-[8px] text-white/25 mt-1 text-right font-medium">
           {spot.barLabel}
         </p>
+
+        {/* Contextual insight sentence */}
+        {spot.insightText && (
+          <motion.p
+            initial={{ opacity: 0, y: 6 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
+            className="mt-3 text-[10px] leading-relaxed border-t pt-3"
+            style={{ color: 'rgba(255,255,255,0.38)', borderColor: `${spot.border}` }}
+          >
+            {spot.insightText}
+          </motion.p>
+        )}
       </div>
     </motion.div>
   );
 };
+
+/* ─── Contextual Insight Text generator ─── */
+function buildInsightText(spot) {
+  const { eyebrow, player, displayValue, unit, secondaryStat } = spot;
+  const name = player.name.split(' ').pop();
+  switch (spot.key) {
+    case 'scorer': {
+      const sr = secondaryStat ? ` at a blazing SR of ${secondaryStat.value}` : '';
+      return `${name} leads all batters with ${displayValue} ${unit}${sr} — a dominant tournament with the bat.`;
+    }
+    case 'bowler': {
+      const eco = secondaryStat ? ` with an economy of ${secondaryStat.value}` : '';
+      return `${name} is the wicket-taking machine — ${displayValue} ${unit}${eco} make them the most dangerous bowler.`;
+    }
+    case 'striker': {
+      const runs = secondaryStat ? `, scoring ${secondaryStat.value} runs` : '';
+      return `${name} strikes at ${displayValue}${runs} — an explosive tempo that keeps bowlers on edge.`;
+    }
+    case 'economy': {
+      const wkts = secondaryStat ? ` and ${secondaryStat.value} wickets` : '';
+      return `${name} concedes just ${displayValue} runs/over${wkts} — the tightest and most miserly bowler in the tournament.`;
+    }
+    default:
+      return '';
+  }
+}
 
 /* ─── Main component ─── */
 const InsightEngine = ({ players = [] }) => {
@@ -192,27 +241,29 @@ const InsightEngine = ({ players = [] }) => {
       parseFloat(p.economy) > 0 && (p.wickets || 0) >= MIN_WICKETS_ECON
     );
 
-    // Sort descending / ascending
     const topScorer     = [...withRuns].sort((a, b) => (b.runs    || 0) - (a.runs    || 0))[0];
     const bestBowler    = [...withWickets].sort((a, b) => (b.wickets || 0) - (a.wickets || 0))[0];
     const fastStriker   = [...withSR].sort(
       (a, b) => parseFloat(b.strikeRate) - parseFloat(a.strikeRate)
     )[0];
     const bestEconomist = [...withEconomy].sort(
-      (a, b) => parseFloat(a.economy) - parseFloat(b.economy)   // ascending — lower is better
+      (a, b) => parseFloat(a.economy) - parseFloat(b.economy)
     )[0];
 
-    return [
+    const allRunners = [...withRuns].sort((a, b) => (b.runs || 0) - (a.runs || 0));
+    const allWkts    = [...withWickets].sort((a, b) => (b.wickets || 0) - (a.wickets || 0));
+
+    const spots = [
       topScorer && {
         key:          'scorer',
         eyebrow:      'Top Scorer',
         subtitle:     'Most runs this tournament',
-        icon:         '\uD83C\uDFCF', // 🏏
+        icon:         '\uD83C\uDFCF',
         player:       topScorer,
         displayValue: topScorer.runs,
         unit:         'runs',
         pct:          100,
-        barLabel:     `Best in tournament`,
+        barLabel:     `No.1 of ${allRunners.length} batters`,
         secondaryStat: topScorer.strikeRate
           ? { label: 'SR', value: Number(topScorer.strikeRate).toFixed(1) }
           : null,
@@ -224,12 +275,12 @@ const InsightEngine = ({ players = [] }) => {
         key:          'bowler',
         eyebrow:      'Best Bowler',
         subtitle:     'Most wickets in the tournament',
-        icon:         '\u26A1', // ⚡
+        icon:         '\u26A1',
         player:       bestBowler,
         displayValue: bestBowler.wickets,
         unit:         'wickets',
         pct:          100,
-        barLabel:     `Tournament leader`,
+        barLabel:     `No.1 of ${allWkts.length} bowlers`,
         secondaryStat: bestBowler.economy
           ? { label: 'Econ', value: Number(bestBowler.economy).toFixed(2) }
           : null,
@@ -241,12 +292,12 @@ const InsightEngine = ({ players = [] }) => {
         key:          'striker',
         eyebrow:      'Fastest Striker',
         subtitle:     `Min ${MIN_BALLS_FOR_SR} balls faced`,
-        icon:         '\uD83D\uDCA5', // 💥
+        icon:         '\uD83D\uDCA5',
         player:       fastStriker,
         displayValue: Number(fastStriker.strikeRate).toFixed(1),
         unit:         'SR',
         pct:          Math.min(100, Math.round((parseFloat(fastStriker.strikeRate) / 200) * 100)),
-        barLabel:     '/ 200 benchmark',
+        barLabel:     `${Math.min(100, Math.round((parseFloat(fastStriker.strikeRate) / 200) * 100))}% of 200 benchmark`,
         secondaryStat: fastStriker.runs
           ? { label: 'Runs', value: fastStriker.runs }
           : null,
@@ -258,12 +309,12 @@ const InsightEngine = ({ players = [] }) => {
         key:          'economy',
         eyebrow:      'Best Economy',
         subtitle:     'Tightest bowler — runs per over',
-        icon:         String.fromCodePoint(0x1F512), // 🔒
+        icon:         String.fromCodePoint(0x1F512),
         player:       bestEconomist,
         displayValue: Number(bestEconomist.economy).toFixed(2),
         unit:         'econ',
         pct:          100,
-        barLabel:     'Tournament best (lower = better)',
+        barLabel:     'Tournament best · lower = better',
         secondaryStat: bestEconomist.wickets
           ? { label: 'Wickets', value: bestEconomist.wickets }
           : null,
@@ -272,6 +323,9 @@ const InsightEngine = ({ players = [] }) => {
         border: 'rgba(251,146,60,0.28)',
       },
     ].filter(Boolean);
+
+    // Attach contextual insight text
+    return spots.map(s => ({ ...s, insightText: buildInsightText(s) }));
   }, [players]);
 
   if (!spots.length) return null;
