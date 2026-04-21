@@ -148,9 +148,9 @@
   --navy-600:   #152845;
   --navy-500:   #1c3560;
   --navy-400:   #254070;
-  --gold:       #c9a227;
-  --gold-light: #e6be5a;
-  --gold-pale:  #f5e3a8;
+  --gold:       #ff2fa7; /* primary accent switched to hot pink */
+  --gold-light: #ff71b8; /* lighter pink for hover and highlights */
+  --gold-pale:  #ffd7f0; /* very pale pink for subtle backgrounds */
   --white:      #ffffff;
   --off-white:  #f0f4f8;
   --grey-100:   #e8edf3;
@@ -166,8 +166,8 @@
   --green-500:  #16a34a;
   --green-400:  #22c55e;
 
-  --card-bg:      rgba(255,255,255,0.04);
-  --card-border:  rgba(255,255,255,0.08);
+  --card-bg:      rgba(255,255,255,0.03);
+  --card-border:  rgba(255,255,255,0.06);
   --card-shadow:  0 4px 24px rgba(0,0,0,0.35);
 
   --font-display: 'Barlow Condensed', sans-serif;
