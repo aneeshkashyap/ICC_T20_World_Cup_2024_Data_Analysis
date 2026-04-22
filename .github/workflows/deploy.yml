@@ -35,6 +35,8 @@ jobs:
       - name: Build with Vite
         working-directory: react-dashboard
         run: npm run build
+        env:
+          VITE_BASE_URL: /ICC_T20_World_Cup_2024_Data_Analysis/
 
       - name: Deploy dist to gh-pages branch
         uses: peaceiris/actions-gh-pages@v3

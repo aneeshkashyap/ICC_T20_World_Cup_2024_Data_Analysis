@@ -29,7 +29,7 @@ const TEAM_FLAGS = {
   England:                    'https://flagcdn.com/w40/gb-eng.png',
   Pakistan:                   'https://flagcdn.com/w40/pk.png',
   'South Africa':             'https://flagcdn.com/w40/za.png',
-  'West Indies':              '/ICC_T20_World_Cup_2024_Data_Analysis/flag-west-indies.png',
+  'West Indies':              '/flag-west-indies.png',
   Afghanistan:                'https://flagcdn.com/w40/af.png',
   Bangladesh:                 'https://flagcdn.com/w40/bd.png',
   'New Zealand':              'https://flagcdn.com/w40/nz.png',
