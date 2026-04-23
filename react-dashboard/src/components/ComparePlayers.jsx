@@ -64,6 +64,7 @@ DualBar.displayName = 'DualBar';
 const StatRow = memo(({ label, a, b, higherIsBetter = true, format = v => cleanStat(v), rowIdx = 0 }) => {
   const numA  = parseFloat(a) || 0;
   const numB  = parseFloat(b) || 0;
+  const maxVal = Math.max(numA, numB, 1);
   const isTie = numA === numB;
   const aWins = !isTie && (higherIsBetter
     ? numA > numB
@@ -74,30 +75,35 @@ const StatRow = memo(({ label, a, b, higherIsBetter = true, format = v => cleanS
 
   const delay = rowIdx * 0.07;
 
+  /* ── WINNER = bright glow / LOSER = aggressively dimmed ── */
   const clsA = isTie
-    ? 'text-icc-gold/75 font-bold'
+    ? 'text-icc-gold/80 font-bold'
     : aWins
-    ? 'text-emerald-400 font-black drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]'
-    : 'text-white/30 font-medium';
+    ? 'text-emerald-300 font-black drop-shadow-[0_0_10px_rgba(52,211,153,0.65)] scale-110'
+    : 'text-white/20 font-medium';
 
   const clsB = isTie
-    ? 'text-icc-gold/75 font-bold'
+    ? 'text-icc-gold/80 font-bold'
     : bWins
-    ? 'text-emerald-400 font-black drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]'
-    : 'text-white/30 font-medium';
+    ? 'text-emerald-300 font-black drop-shadow-[0_0_10px_rgba(52,211,153,0.65)] scale-110'
+    : 'text-white/20 font-medium';
 
   const BestBadge = (
     <motion.span
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', delay: delay + 0.25, stiffness: 500, damping: 18 }}
-      className="inline-block text-[7.5px] font-black bg-emerald-500/15 text-emerald-400
-                 border border-emerald-500/25 px-1.5 py-0.5 rounded-full
-                 uppercase tracking-wide leading-none"
+      className="inline-block text-[7.5px] font-black bg-emerald-500/20 text-emerald-400
+                 border border-emerald-500/30 px-1.5 py-0.5 rounded-full
+                 uppercase tracking-wide leading-none shadow-[0_0_8px_rgba(52,211,153,0.3)]"
     >
       Best
     </motion.span>
   );
+
+  /* ── BAR WIDTHS: each side 0–100% of the winner's value ── */
+  const pctA = (numA / maxVal) * 100;
+  const pctB = (numB / maxVal) * 100;
 
   return (
     <motion.div
@@ -107,11 +113,11 @@ const StatRow = memo(({ label, a, b, higherIsBetter = true, format = v => cleanS
       className="group py-3.5 border-b border-white/[0.05] last:border-0
                  hover:bg-white/[0.03] rounded-xl px-2 -mx-2 transition-colors duration-200"
     >
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 mb-2.5">
-        {/* A */}
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 mb-2">
+        {/* A value */}
         <div className="flex items-center justify-end gap-1.5">
           {aWins && BestBadge}
-          <span className={`text-lg leading-none tabular-nums transition-all ${clsA}`}>
+          <span className={`text-lg leading-none tabular-nums transition-all duration-300 ${clsA}`}>
             {format(a)}
           </span>
         </div>
@@ -126,16 +132,60 @@ const StatRow = memo(({ label, a, b, higherIsBetter = true, format = v => cleanS
           )}
         </div>
 
-        {/* B */}
+        {/* B value */}
         <div className="flex items-center justify-start gap-1.5">
-          <span className={`text-lg leading-none tabular-nums transition-all ${clsB}`}>
+          <span className={`text-lg leading-none tabular-nums transition-all duration-300 ${clsB}`}>
             {format(b)}
           </span>
           {bWins && BestBadge}
         </div>
       </div>
 
-      <DualBar numA={numA} numB={numB} aWins={aWins} bWins={bWins} delay={delay + 0.18} />
+      {/* ── PREMIUM PROGRESS BARS: separate bar per side ── */}
+      {numA > 0 || numB > 0 ? (
+        <div className="grid grid-cols-[1fr_auto_1fr] gap-3 mt-1.5 items-center">
+          {/* A bar — grows right-to-left */}
+          <div className="relative h-1.5 rounded-full overflow-hidden bg-white/[0.05] flex justify-end">
+            <motion.div
+              className="h-full rounded-full"
+              style={{
+                background: aWins
+                  ? 'linear-gradient(to left, #34d399, #059669)'
+                  : isTie
+                  ? 'linear-gradient(to left, #fbbf24, #b45309)'
+                  : 'rgba(255,255,255,0.08)',
+                boxShadow: aWins ? '0 0 6px rgba(52,211,153,0.5)' : 'none',
+              }}
+              initial={{ width: 0 }}
+              animate={{ width: `${pctA}%` }}
+              transition={{ duration: 0.85, delay: delay + 0.2, ease: [0.22, 1, 0.36, 1] }}
+            />
+          </div>
+
+          {/* Centre divider */}
+          <div className="w-px h-3 bg-white/10 shrink-0" />
+
+          {/* B bar — grows left-to-right */}
+          <div className="relative h-1.5 rounded-full overflow-hidden bg-white/[0.05]">
+            <motion.div
+              className="h-full rounded-full absolute left-0 top-0"
+              style={{
+                background: bWins
+                  ? 'linear-gradient(to right, #34d399, #059669)'
+                  : isTie
+                  ? 'linear-gradient(to right, #fbbf24, #b45309)'
+                  : 'rgba(255,255,255,0.08)',
+                boxShadow: bWins ? '0 0 6px rgba(52,211,153,0.5)' : 'none',
+              }}
+              initial={{ width: 0 }}
+              animate={{ width: `${pctB}%` }}
+              transition={{ duration: 0.85, delay: delay + 0.25, ease: [0.22, 1, 0.36, 1] }}
+            />
+          </div>
+        </div>
+      ) : (
+        <DualBar numA={numA} numB={numB} aWins={aWins} bWins={bWins} delay={delay + 0.18} />
+      )}
     </motion.div>
   );
 });
@@ -788,153 +838,196 @@ const ComparePlayers = ({ players = [], defaultIdA = '', defaultIdB = '' }) => {
                   )}
                 </AnimatePresence>
 
-                {/* Verdict banner */}
+                {/* ══════ ENHANCED FINAL VERDICT SECTION ══════ */}
                 {verdict && (
                   <motion.div
-                    initial={{ opacity: 0, y: 14 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.45, delay: 0.22 }}
-                    className={`rounded-2xl p-5
-                      ${verdict.draw
-                        ? 'bg-white/[0.04] border border-white/10'
-                        : 'bg-gradient-to-br from-emerald-500/[0.07] to-transparent border border-emerald-500/20'}`}
+                    initial={{ opacity: 0, y: 20, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.5, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                    className="backdrop-blur-lg rounded-2xl border overflow-hidden"
+                    style={verdict.draw
+                      ? { background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)' }
+                      : {
+                          background: 'linear-gradient(135deg, rgba(52,211,153,0.07) 0%, rgba(5,150,105,0.04) 50%, rgba(0,0,0,0) 100%)',
+                          borderColor: 'rgba(52,211,153,0.22)',
+                          boxShadow: '0 0 40px rgba(52,211,153,0.08), inset 0 1px 0 rgba(255,255,255,0.05)',
+                        }
+                    }
                   >
-                    {verdict.draw ? (
-                      <div className="flex items-center justify-center gap-3">
-                        <span className="text-2xl select-none" aria-hidden="true">{String.fromCodePoint(0x1F91D)}</span>
-                        <div className="text-center">
-                          <p className="font-condensed font-black text-lg text-white
-                                        uppercase tracking-wide">
-                            It's a Draw!
-                          </p>
-                          <p className="text-xs text-icc-muted mt-0.5">
-                            Both players won{' '}
-                            <span className="text-icc-gold font-bold">{verdict.winsA}</span>{' '}
-                            categor{verdict.winsA !== 1 ? 'ies' : 'y'} each.
-                          </p>
+                    {/* Header strip */}
+                    <div
+                      className="px-5 py-3 border-b"
+                      style={{ borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}
+                    >
+                      <p className="text-[9px] font-black uppercase tracking-[0.22em] text-icc-muted/55 flex items-center gap-1.5">
+                        <span>🏆</span> Final Verdict
+                      </p>
+                    </div>
+
+                    <div className="p-5">
+                      {verdict.draw ? (
+                        /* ── Draw state ── */
+                        <div className="flex items-center justify-center gap-3 mb-4">
+                          <span className="text-2xl select-none" aria-hidden="true">{String.fromCodePoint(0x1F91D)}</span>
+                          <div className="text-center">
+                            <p className="font-condensed font-black text-lg text-white uppercase tracking-wide">
+                              It&apos;s a Draw!
+                            </p>
+                            <p className="text-xs text-icc-muted mt-0.5">
+                              Both players won{' '}
+                              <span className="text-icc-gold font-bold">{verdict.winsA}</span>{' '}
+                              categor{verdict.winsA !== 1 ? 'ies' : 'y'} each.
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          {/* ── Three verdict lines: batting / bowling / overall ── */}
+                          <div className="flex flex-col gap-3 mb-5">
+
+                            {/* Line 1: 🔥 Batting dominance */}
+                            <motion.div
+                              initial={{ opacity: 0, x: -12 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.4, delay: 0.35 }}
+                              className="flex items-center gap-3 px-4 py-3 rounded-xl
+                                         border border-amber-400/15 backdrop-blur-sm"
+                              style={{ background: 'rgba(251,191,36,0.06)' }}
+                            >
+                              <span className="text-xl shrink-0" aria-hidden="true">🔥</span>
+                              <div>
+                                <p className="text-[9px] uppercase tracking-widest font-bold text-amber-400/60 mb-0.5">
+                                  Batting
+                                </p>
+                                <p className="text-sm font-bold text-amber-200/90">
+                                  {domainVerdicts
+                                    ? domainVerdicts.batting.winner === 'tie'
+                                      ? 'Batting is perfectly level'
+                                      : domainVerdicts.batting.label + ' in batting'
+                                    : '—'
+                                  }
+                                </p>
+                              </div>
+                            </motion.div>
+
+                            {/* Line 2: 🎯 Bowling lead */}
+                            <motion.div
+                              initial={{ opacity: 0, x: -12 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.4, delay: 0.45 }}
+                              className="flex items-center gap-3 px-4 py-3 rounded-xl
+                                         border border-cyan-400/15 backdrop-blur-sm"
+                              style={{ background: 'rgba(6,182,212,0.06)' }}
+                            >
+                              <span className="text-xl shrink-0" aria-hidden="true">🎯</span>
+                              <div>
+                                <p className="text-[9px] uppercase tracking-widest font-bold text-cyan-400/60 mb-0.5">
+                                  Bowling
+                                </p>
+                                <p className="text-sm font-bold text-cyan-200/90">
+                                  {domainVerdicts
+                                    ? domainVerdicts.bowling.winner === 'tie'
+                                      ? 'Bowling is perfectly level'
+                                      : domainVerdicts.bowling.label + ' in bowling'
+                                    : '—'
+                                  }
+                                </p>
+                              </div>
+                            </motion.div>
+
+                            {/* Line 3: 🏆 Overall Winner */}
+                            <motion.div
+                              initial={{ opacity: 0, x: -12 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.4, delay: 0.55 }}
+                              className="flex items-center gap-3 px-4 py-3 rounded-xl
+                                         border border-emerald-500/25 backdrop-blur-sm relative overflow-hidden"
+                              style={{
+                                background: 'linear-gradient(135deg, rgba(52,211,153,0.10), rgba(5,150,105,0.06))',
+                                boxShadow: '0 0 20px rgba(52,211,153,0.10)',
+                              }}
+                            >
+                              {/* Animated shimmer accent */}
+                              <motion.div
+                                aria-hidden="true"
+                                className="absolute inset-0 pointer-events-none"
+                                style={{
+                                  background: 'linear-gradient(90deg, transparent 0%, rgba(52,211,153,0.06) 50%, transparent 100%)',
+                                }}
+                                animate={{ x: ['-100%', '100%'] }}
+                                transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', repeatDelay: 1.5 }}
+                              />
+                              <span className="text-xl shrink-0" aria-hidden="true">🏆</span>
+                              <div className="flex-1">
+                                <p className="text-[9px] uppercase tracking-widest font-bold text-emerald-400/70 mb-0.5">
+                                  Overall Winner
+                                </p>
+                                <p className="font-condensed font-black text-lg text-emerald-300 uppercase tracking-wide
+                                             drop-shadow-[0_0_12px_rgba(52,211,153,0.5)]">
+                                  {verdict.winner.name}
+                                </p>
+                              </div>
+                              {/* Win count badge */}
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: 'spring', stiffness: 500, damping: 18, delay: 0.65 }}
+                                className="shrink-0 w-10 h-10 rounded-full flex flex-col items-center justify-center
+                                           bg-emerald-500/20 border border-emerald-500/30"
+                              >
+                                <span className="font-black text-sm text-emerald-300 leading-none">
+                                  {verdict.winner === playerA ? verdict.winsA : verdict.winsB}
+                                </span>
+                                <span className="text-[7px] text-emerald-400/50 font-bold">/{stats.length}</span>
+                              </motion.div>
+                            </motion.div>
+                          </div>
+
+                          {/* Win-ratio bar */}
+                          <WinRatioBar
+                            winsA={verdict.winsA}
+                            winsB={verdict.winsB}
+                            total={stats.length}
+                            nameA={playerA.name.split(' ').slice(-1)[0]}
+                            nameB={playerB.name.split(' ').slice(-1)[0]}
+                            winnerIsA={verdict.winner === playerA}
+                          />
+
+                          {/* Verdict summary sentence */}
                           {verdictSummary && (
                             <motion.p
                               initial={{ opacity: 0, y: 6 }}
                               animate={{ opacity: 1, y: 0 }}
-                              transition={{ duration: 0.4, delay: 0.4 }}
-                              className="text-[10px] text-white/35 italic mt-2 leading-relaxed"
+                              transition={{ duration: 0.4, delay: 0.6 }}
+                              className="mt-4 text-center text-[11px] text-white/40 leading-relaxed
+                                         italic border-t border-white/[0.06] pt-4"
                             >
                               {verdictSummary}
                             </motion.p>
                           )}
-                          {/* Domain chips — still shown in a draw so the breakdown is visible */}
-                          {domainVerdicts && (
-                            <div className="flex gap-2 mt-3 w-full max-w-xs">
-                              <DomainChip
-                                icon={String.fromCodePoint(0x1F3CF)}
-                                label={domainVerdicts.batting.label}
-                                winner={domainVerdicts.batting.winner}
-                                accent="#FFD700"
-                                delay={0.42}
-                              />
-                              <DomainChip
-                                icon={String.fromCodePoint(0x26A1)}
-                                label={domainVerdicts.bowling.label}
-                                winner={domainVerdicts.bowling.winner}
-                                accent="#34D399"
-                                delay={0.52}
-                              />
-                            </div>
-                          )}
+                        </>
+                      )}
+
+                      {/* Domain chips row — always shown if available */}
+                      {domainVerdicts && verdict.draw && (
+                        <div className="flex gap-2.5 mt-3">
+                          <DomainChip
+                            icon={String.fromCodePoint(0x1F3CF)}
+                            label={domainVerdicts.batting.label}
+                            winner={domainVerdicts.batting.winner}
+                            accent="#FFD700"
+                            delay={0.42}
+                          />
+                          <DomainChip
+                            icon={String.fromCodePoint(0x26A1)}
+                            label={domainVerdicts.bowling.label}
+                            winner={domainVerdicts.bowling.winner}
+                            accent="#34D399"
+                            delay={0.52}
+                          />
                         </div>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="flex items-center justify-center gap-3 mb-5">
-                          <span className="text-2xl select-none" aria-hidden="true">{String.fromCodePoint(0x1F3C6)}</span>
-                          <div className="text-center">
-                            {/* DOMINANT badge — shown when winner sweeps 4+ of 5 categories */}
-                            {(verdict.winner === playerA ? verdict.winsA : verdict.winsB) >= Math.ceil(stats.length * 0.75) && (
-                              <motion.div
-                                initial={{ opacity: 0, scale: 0.7, y: -6 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                transition={{ type: 'spring', stiffness: 420, damping: 18, delay: 0.3 }}
-                                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full mb-2
-                                           text-[9px] font-black uppercase tracking-[0.2em] select-none
-                                           border border-amber-400/40"
-                                style={{
-                                  background: 'linear-gradient(90deg, rgba(251,191,36,0.15), rgba(234,179,8,0.08))',
-                                  color: '#FCD34D',
-                                  boxShadow: '0 0 18px rgba(251,191,36,0.18)',
-                                }}
-                              >
-                                <motion.span
-                                  animate={{ rotate: [0, 15, -15, 0] }}
-                                  transition={{ duration: 1.8, repeat: Infinity, repeatDelay: 2.5 }}
-                                  aria-hidden="true"
-                                >
-                                  {String.fromCodePoint(0x1F525)}
-                                </motion.span>
-                                Dominant
-                              </motion.div>
-                            )}
-                            <p className="text-[9px] text-emerald-400/65 uppercase
-                                          tracking-widest font-bold mb-0.5">
-                              Overall Winner
-                            </p>
-                            <p className="font-condensed font-black text-xl text-emerald-400
-                                          uppercase tracking-wide">
-                              {verdict.winner.name}
-                            </p>
-                            <p className="text-xs text-icc-muted mt-0.5">
-                              Won{' '}
-                              <span className="text-emerald-400 font-bold">
-                                {verdict.winner === playerA ? verdict.winsA : verdict.winsB}
-                              </span>{' '}
-                              of {stats.length} stat categories
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Win-ratio bar */}
-                        <WinRatioBar
-                          winsA={verdict.winsA}
-                          winsB={verdict.winsB}
-                          total={stats.length}
-                          nameA={playerA.name.split(' ').slice(-1)[0]}
-                          nameB={playerB.name.split(' ').slice(-1)[0]}
-                          winnerIsA={verdict.winner === playerA}
-                        />
-
-                        {/* Domain verdict chips — batting & bowling breakdown */}
-                        {domainVerdicts && (
-                          <div className="flex gap-2.5 mt-4">
-                            <DomainChip
-                              icon={String.fromCodePoint(0x1F3CF)}
-                              label={domainVerdicts.batting.label}
-                              winner={domainVerdicts.batting.winner}
-                              accent="#FFD700"
-                              delay={0.45}
-                            />
-                            <DomainChip
-                              icon={String.fromCodePoint(0x26A1)}
-                              label={domainVerdicts.bowling.label}
-                              winner={domainVerdicts.bowling.winner}
-                              accent="#34D399"
-                              delay={0.55}
-                            />
-                          </div>
-                        )}
-
-                        {/* Verdict summary sentence */}
-                        {verdictSummary && (
-                          <motion.p
-                            initial={{ opacity: 0, y: 6 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.4, delay: 0.5 }}
-                            className="mt-4 text-center text-[11px] text-white/40 leading-relaxed
-                                       italic border-t border-white/[0.06] pt-4"
-                          >
-                            {verdictSummary}
-                          </motion.p>
-                        )}
-                      </>
-                    )}
+                      )}
+                    </div>
                   </motion.div>
                 )}
               </motion.div>
